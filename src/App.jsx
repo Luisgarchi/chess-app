@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import Position from "./chess/utils/Position";
 import GameMode from "./components/GameMode";
 import ChessBoard from "./components/ChessBoard";
 import Player from "./components/Player";
@@ -19,30 +18,6 @@ function deriveActivePlayer(history){
     }
 }
 
-function deriveBoard(pieces){
-
-    const board = Array.from({ length: 8 }, () => Array(8).fill(null))
-    
-    function formatRow(row) {
-        const nRows = board.length
-        /* subtract 1 from row because board is represented as an array (starts at zero index)
-        subtract from nRows since we want lower rows displayed at the bottom of the console instead of at top*/ 
-        return (nRows - 1) - (row - 1)
-    }
-
-    function formatColumn(column){
-        // zero index columns
-        return column - 1
-    }
-
-    for(const piece of pieces){
-        const row = formatRow(piece.position.rank)
-        const column = formatColumn(Position.fileToNum(piece.position.file))
-        board[row][column] = piece
-    }
-
-    return board
-}
 
 export default function App(){
 
@@ -53,7 +28,6 @@ export default function App(){
     
     // Derive from state
     const activePlayer = deriveActivePlayer(history)
-    const board = deriveBoard(pieces)
 
     /*const winner = deriveWinner(board, history, players)
     const isDraw = deriveDraw()
@@ -79,7 +53,7 @@ export default function App(){
                 </div>
                 <div className="flex flex-col items-center justify-center gap-4">
                     <Player initialName={players.black.name} colour="black" onChangeName={handlePlayerNameChange}/>
-                    <ChessBoard board={board}/>
+                    <ChessBoard pieces={pieces}/>
                     <Player initialName={players.white.name} colour="white" onChangeName={handlePlayerNameChange}/>
                 </div>
             </div>

@@ -12,7 +12,7 @@ import pawnWhite from '../assets/pawnWhite.svg'
 import pawnBlack from '../assets/pawnBlack.svg'
 
 
-export default function DisplayPiece({ piece }) {
+export default function DisplaySquare({ piece, squareColour, maskValue }) {
     const pieceImages = {
         King: { white: kingWhite, black: kingBlack },
         Queen: { white: queenWhite, black: queenBlack },
@@ -23,6 +23,15 @@ export default function DisplayPiece({ piece }) {
     };
 
     const pieceImage = pieceImages[piece.type][piece.colour];
+
+    /*
+    if (squareColour === "light") {
+        cssSquare += " bg-[#F0D9B5]"
+    }
+    else {
+        cssSquare += " bg-[#b58863]"
+    }
+    */
 
     return (
         <button className="w-full h-full p-0 m-0 flex justify-center items-center">
