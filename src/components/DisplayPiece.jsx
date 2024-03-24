@@ -14,12 +14,12 @@ import pawnBlack from '../assets/pawnBlack.svg'
 
 export default function DisplayPiece({ piece }) {
     const pieceImages = {
-        king: { white: kingWhite, black: kingBlack },
-        queen: { white: queenWhite, black: queenBlack },
-        rook: { white: rookWhite, black: rookBlack },
-        bishop: { white: bishopWhite, black: bishopBlack },
-        knight: { white: knightWhite, black: knightBlack },
-        pawn: { white: pawnWhite, black: pawnBlack },
+        King: { white: kingWhite, black: kingBlack },
+        Queen: { white: queenWhite, black: queenBlack },
+        Rook: { white: rookWhite, black: rookBlack },
+        Bishop: { white: bishopWhite, black: bishopBlack },
+        Knight: { white: knightWhite, black: knightBlack },
+        Pawn: { white: pawnWhite, black: pawnBlack },
     };
 
     const pieceImage = pieceImages[piece.type][piece.colour];
