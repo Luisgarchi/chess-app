@@ -35,13 +35,13 @@ export const allVectorPositionsOnBoard = function(vector, piece){
     }
 
     // Calculate the next file and rank after moving once along a vector
-    let nextFile = fileToNum(piece.position.file) + vector.fileComponent
+    let nextFile = Position.fileToNum(piece.position.file) + vector.fileComponent
     let nextRank = piece.position.rank + vector.rankComponent
 
     while (isOnBoard(nextFile, nextRank)){
 
         // Create a new position and append it to array
-        const newPosition = new Position(numToFile(nextFile), nextRank)
+        const newPosition = new Position(Position.numToFile(nextFile), nextRank)
         positions.push(newPosition)
 
         // Create the next vector

@@ -11,8 +11,11 @@ import knightBlack from '../assets/knightBlack.svg'
 import pawnWhite from '../assets/pawnWhite.svg'
 import pawnBlack from '../assets/pawnBlack.svg'
 
+import highlightVacant from '../assets/highlightVacant.svg'
+import highlightEnemy from '../assets/highlightEnemy.svg'
 
 export default function DisplaySquare({ piece, squareColour, maskValue }) {
+
     const pieceImages = {
         King: { white: kingWhite, black: kingBlack },
         Queen: { white: queenWhite, black: queenBlack },
@@ -22,20 +25,29 @@ export default function DisplaySquare({ piece, squareColour, maskValue }) {
         Pawn: { white: pawnWhite, black: pawnBlack },
     };
 
-    const pieceImage = pieceImages[piece.type][piece.colour];
+    const pieceImage = piece ? pieceImages[piece.type][piece.colour] : null;
+    const showOverlay = maskValue === 'available' || maskValue === 'enemy' || maskValue === 'selected';
 
-    /*
-    if (squareColour === "light") {
-        cssSquare += " bg-[#F0D9B5]"
-    }
-    else {
-        cssSquare += " bg-[#b58863]"
-    }
-    */
+    const colourCSS = (squareColour === "light")  ? " bg-[#F0D9B5]" : " bg-[#b58863]"
+    const cssSquare = `relative w-full h-full p-0 m-0 flex justify-center items-center ${colourCSS}`
+
 
     return (
-        <button className="w-full h-full p-0 m-0 flex justify-center items-center">
-            <img className="w-full h-full object-contain" src={pieceImage} alt={`${piece.colour} ${piece.type}`} />
+        <button className = {cssSquare}>
+            {piece && (
+                <img 
+                    className = "absolute top-0 left-0 w-full h-full object-contain z-10" 
+                    src={pieceImage} 
+                    alt={`${piece.colour} ${piece.type}`} 
+                 />
+            )}
+            {showOverlay && (
+                <img 
+                    className = "absolute top-0 left-0 w-full h-full object-contain z-20" 
+                    src={ (piece === null) ? highlightVacant : highlightEnemy} 
+                    alt="Highlight" 
+                />
+            )}
         </button>
     );
 }

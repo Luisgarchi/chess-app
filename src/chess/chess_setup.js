@@ -15,7 +15,7 @@ export const INITIAL_PLAYERS = {
 
 import Position from './utils/Position'
 
-const SQUARE_BOARD_SIZE = 8
+export const SQUARE_BOARD_SIZE = 8
 const START_FILE = 'a'
 const START_RANK = 1
 

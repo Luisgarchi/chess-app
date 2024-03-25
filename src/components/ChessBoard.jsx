@@ -1,26 +1,26 @@
 import { useState } from "react"
 
 import DisplaySquare from "./DisplaySquare"
+import { SQUARE_BOARD_SIZE } from "../chess/chess_setup" 
 import Position from "../chess/utils/Position"
 
+function formatRow(row) {
+
+    /* subtract 1 from row because board is represented as an array (starts at zero index)
+    subtract from nRows since we want lower rows displayed at the bottom of the console instead of at top*/ 
+    return (SQUARE_BOARD_SIZE - 1) - (row - 1)
+}
+
+function formatColumn(column){
+    // zero index columns
+    return column - 1
+}
 
 function deriveBoard(pieces){
 
     // Derives the chess board from an array of active chess pieces
 
     const board = Array.from({ length: 8 }, () => Array(8).fill(null))
-    
-    function formatRow(row) {
-        const nRows = board.length
-        /* subtract 1 from row because board is represented as an array (starts at zero index)
-        subtract from nRows since we want lower rows displayed at the bottom of the console instead of at top*/ 
-        return (nRows - 1) - (row - 1)
-    }
-
-    function formatColumn(column){
-        // zero index columns
-        return column - 1
-    }
 
     for(const piece of pieces){
         const row = formatRow(piece.position.rank)
@@ -31,7 +31,7 @@ function deriveBoard(pieces){
     return board
 }
 
-function deriveMaskForPotentialMovingSquares(selectedPiece, piecesArray){
+function deriveMaskSquareHighlights(selectedPiece, piecesArray){
 
     // Derive a mask that highlights squares of relevance for the selected piece
     
@@ -70,11 +70,11 @@ function deriveMaskForPotentialMovingSquares(selectedPiece, piecesArray){
 export default function ChessBoard({ pieces }) {
 
 
-    const [selectedPiece, setSelectedPiece] = useState(null)
+    const [selectedPiece, setSelectedPiece] = useState(pieces[17])
 
     // Derive the representation of the board as well as the mask
     const board = deriveBoard(pieces)
-    const mask = (selectedPiece === null) ? null : deriveMaskForPotentialMovingSquares(selectedPiece)
+    const mask = (selectedPiece === null) ? null : deriveMaskSquareHighlights(selectedPiece, pieces)
 
 
     return(
