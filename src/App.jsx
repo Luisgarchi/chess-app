@@ -27,7 +27,7 @@ export default function App(){
     const [history, setHistory] = useState([])
     
     // Derive from state
-    const activePlayer = deriveActivePlayer(history)
+    const turn = deriveActivePlayer(history)
 
     /*const winner = deriveWinner(board, history, players)
     const isDraw = deriveDraw()
@@ -45,6 +45,18 @@ export default function App(){
         })
     }
 
+    handlePieceSelect(){
+        return 1;
+    }
+
+    handlePieceMove(){
+        return 11
+    }
+
+    handleClick(){
+        return 1
+    }
+
     return (
         <div className="bg-stone-200 w-screen h-screen flex justify-center items-center">
             <div className="flex gap-4">
@@ -53,7 +65,7 @@ export default function App(){
                 </div>
                 <div className="flex flex-col items-center justify-center gap-4">
                     <Player initialName={players.black.name} colour="black" onChangeName={handlePlayerNameChange}/>
-                    <ChessBoard pieces={pieces}/>
+                    <ChessBoard pieces={pieces} turn = {turn}/>
                     <Player initialName={players.white.name} colour="white" onChangeName={handlePlayerNameChange}/>
                 </div>
             </div>

@@ -67,15 +67,14 @@ function deriveMaskSquareHighlights(selectedPiece, piecesArray){
     return mask
 }
 
-export default function ChessBoard({ pieces }) {
+export default function ChessBoard({ pieces, turn }) {
 
 
-    const [selectedPiece, setSelectedPiece] = useState(pieces[17])
+    const [selectedPiece, setSelectedPiece] = useState()
 
     // Derive the representation of the board as well as the mask
     const board = deriveBoard(pieces)
     const mask = (selectedPiece === null) ? null : deriveMaskSquareHighlights(selectedPiece, pieces)
-
 
     return(
         <ol className="flex flex-col justify-center items-center">
@@ -85,11 +84,16 @@ export default function ChessBoard({ pieces }) {
                         {row.map((piece, pieceIndex) => {
 
                             const maskValue = (mask === null) ? "none" : mask[rowIndex][pieceIndex]
-                            const squareColour = ((rowIndex + pieceIndex) % 2 === 0) ? "light" : "dark"
-                        
+                            const squareColour = ((rowIndex + pieceIndex) % 2 === 0) ? "bg-[#F0D9B5]" : "bg-[#b58863]"
+                            const squareStyles = `w-16 h-16 flex justify-center items-center ${squareColour}`
                             return (
-                                <li key={pieceIndex} className = "w-16 h-16 flex justify-center items-center">
-                                    <DisplaySquare piece = {piece} squareColour = {squareColour} maskValue = {maskValue}/>
+                                <li key={pieceIndex} className = {squareStyles}>
+                                    <DisplaySquare 
+                                        piece = {piece}
+                                        maskValue = {maskValue}
+                                        selectedPiece={selectedPiece}
+                                        playerTurn = {turn}
+                                    />
                                 </li>
                             )
                         })}
