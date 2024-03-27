@@ -16,20 +16,6 @@ function formatColumn(column){
     return column - 1
 }
 
-function deriveBoard(pieces){
-
-    // Derives the chess board from an array of active chess pieces
-
-    const board = Array.from({ length: 8 }, () => Array(8).fill(null))
-
-    for(const piece of pieces){
-        const row = formatRow(piece.position.rank)
-        const column = formatColumn(Position.fileToNum(piece.position.file))
-        board[row][column] = piece
-    }
-
-    return board
-}
 
 function deriveMaskSquareHighlights(selectedPiece, piecesArray){
 
@@ -45,6 +31,8 @@ function deriveMaskSquareHighlights(selectedPiece, piecesArray){
     )
 
     const reachablePositions = selectedPiece.findReachablePositions(piecesArray)
+    // filter positions that would result in check, they need to be removed as they are illegal
+    
 
     for(const position of reachablePositions){
 
@@ -67,10 +55,10 @@ function deriveMaskSquareHighlights(selectedPiece, piecesArray){
     return mask
 }
 
-export default function ChessBoard({ pieces, turn }) {
+export default function Board({ pieces, history }) {
 
 
-    const [selectedPiece, setSelectedPiece] = useState()
+    const [selectedPiece, setSelectedPiece] = useState(null)
 
     // Derive the representation of the board as well as the mask
     const board = deriveBoard(pieces)

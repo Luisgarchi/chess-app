@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import GameMode from "./components/GameMode";
-import ChessBoard from "./components/ChessBoard";
+import Board from "./components/Board";
 import Player from "./components/Player";
 
 import { INITIAL_PLAYERS, initChessPieces } from "./chess/chess_setup";
@@ -18,13 +18,19 @@ function deriveActivePlayer(history){
     }
 }
 
+const startingFenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 export default function App(){
 
     // Define state hooks
     const [players, setPlayers] = useState(INITIAL_PLAYERS)
+    const [matchLog, setMatchLog] = useState([
+        {
+            boardPositions: startingFenPosition, 
+            moves: null
+        }
+    ])
     const [pieces, setPieces] = useState(initChessPieces())
-    const [history, setHistory] = useState([])
     
     // Derive from state
     const turn = deriveActivePlayer(history)
@@ -45,15 +51,15 @@ export default function App(){
         })
     }
 
-    handlePieceSelect(){
+    function handlePieceSelect(){
         return 1;
     }
 
-    handlePieceMove(){
-        return 11
+    function handlePieceMove(){
+        return 1
     }
 
-    handleClick(){
+    function handleClick(){
         return 1
     }
 

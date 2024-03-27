@@ -21,10 +21,6 @@ export default class Position {
         return this.file + this.rank.toString()
     }
 
-    serialiseICCF() {
-        return Position.fileToNum(this.file).toString() + this.rank.toString()
-    }
-
     /* Static Methods */
 
     static compare(positionA, positionB) {
@@ -43,24 +39,4 @@ export default class Position {
         }
         return false
     }
-
-    static fileToNum(file) {
-
-        // Get the number representation of the file
-        const numberRepresentation = file.charCodeAt(0)
-    
-        // Get the number to subtract from acording to the starting file
-        const startNum = 'a'.charCodeAt(0) -1
-    
-        return numberRepresentation - startNum
-    }
-
-    static numToFile(fileNum) {
-
-        // Get the number starting file number representation
-        const startNum = 'a'.charCodeAt(0) - 1
-    
-        return String.fromCharCode(startNum + fileNum)
-    }
-    
 }
