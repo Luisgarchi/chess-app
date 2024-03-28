@@ -5,6 +5,8 @@ export default class ChessBoard {
 
     constructor(fen){
 
+        this.fen = fen
+
         const fenComponents = fen.split(' ')
 
         this.piecePlacement = fenComponents[0]
@@ -63,6 +65,7 @@ export default class ChessBoard {
 
         return {rowIndex, colIndex}
     }
+    
 
     parseBoard() {
 
@@ -94,9 +97,41 @@ export default class ChessBoard {
         this.board = board
     }
 
+    /* Getters */
 
     getPieceAt(position) {
-        return this.board[position.rowIndex][position.colIndex]
+
+        // Get the piece at the position
+        const piece = this.board[position.rowIndex][position.colIndex]
+        
+        // Check if the piece exists
+        if (piece === null){ 
+            throw new Error("No piece found at position")   
+        }
+
+        return piece
+    }
+
+    getKingPosition(){
+
+        // Get the king symbol
+        const kingSymbol = (this.activeColour === 'w') ? 'K' : 'k'
+
+        // Loop over the board
+        for(let i = 0; i < this.board.length; i++){
+
+            for (let j = 0; j < this.board[i].length; j++){
+
+                // Get the piece at the current position
+                const piece = this.board[i][j]
+
+                // Check if said piece is the king
+                if (piece === kingSymbol){
+                    return {rowIndex: i, colIndex: j}
+                }
+            }
+        }
+        throw new Error(`${(this.activeColour === 'w') ? 'White' : 'Black'} king found on the board`)
     }
 
     // Redundant?
@@ -106,14 +141,14 @@ export default class ChessBoard {
         return {rowIndex, colIndex}
     }
 
+
+
+    /* Movement */
+
     getPieceMoves(position) {
 
         // Get the piece on the board
         const piece = this.getPieceAt(position)
-
-        if (piece === null){ 
-            throw new Error("No piece found at position")   
-        }
 
         // Get the movement vectors for the piece
         const pieceMoveVectors = PIECES[piece].movement
@@ -143,38 +178,32 @@ export default class ChessBoard {
         // Checks to if piece exists and is of correct colour
         const correctColourPieces = (this.activeColour) === "w" ? 'KQRBNP' : 'kqrbnp'
 
-        if (piece === null){ 
-            throw new Error("No piece found at position")   
-        }
-        else if (!correctColourPieces.includes(piece)){
+        if (!correctColourPieces.includes(piece)){
             throw new Error("Incorrect piece colour")
         }
 
         // Get the normal moves for each piece
-        const positions = this.getPieceMoves(position)
+        const regular = this.getPieceMoves(position).filter(
+            (endPosition) => this.isLegalMove(position, endPosition))
 
         // Add special moves
-        
-        // Enpassant
-        positions.push(...this.getEnpassantPositions(position))
+        const enpassant = this.getEnpassantPositions(position).filter(
+            (endPosition) => this.isLegalMove(position, endPosition))
 
-        // Castles
-        positions.push(...this.getCastlesPositions(position))
+        const castles = this.getCastlesPositions(position).filter(
+            (endPosition) => this.isLegalMove(position, endPosition))
 
-        return positions
+        return {regular, enpassant, castles}
     }
+
+
+
+
+    /* Castling */
 
     getCastles(position){
 
         const positions = []
-
-        // Get the piece on the board
-        const piece = this.getPieceAt(position)
-
-        // Return empty array if piece is not king or king is in check
-        if (this.isInCheck() || !'Kk'.includes(piece)){
-            return positions
-        }
 
         const castlesKingTargetSquare = new Map([
             ['K', {rowIndex: 7, colIndex: 6}],
@@ -183,6 +212,9 @@ export default class ChessBoard {
             ['q', {rowIndex: 0, colIndex: 2}]
         ])
 
+        // Get the piece on the board
+        const piece = this.getPieceAt(position)
+
         // Get the relevant castling symbols for the current player
         const castleSymbols = (this.activeColour === 'w') ? "KQ" : "kq"
 
@@ -190,7 +222,13 @@ export default class ChessBoard {
         const castleDirections = this.castlingAvailability.split('')
                                     .filter((char) => castleSymbols.includes(char))
                                     .map((symbol) => castlesKingTargetSquare.get(symbol))
-        
+
+    
+        // Return empty array if piece is not king or king is in check
+        if (this.isCheck() || !'Kk'.includes(piece) || castleDirections.length === 0){
+            return positions
+        }
+
         // Check that the castling directions are valid
         for (const direction of castleDirections){
 
@@ -266,6 +304,11 @@ export default class ChessBoard {
         return true
     }
 
+
+
+
+    /* Enpassant */
+
     getEnpassantPositions(position){
 
         // Get the piece on the board
@@ -293,7 +336,12 @@ export default class ChessBoard {
         return []
     }
 
-    isInCheck(){
+
+
+
+    /* Check and Checkmate */
+
+    isCheck(){
 
         // Get the king position
         const kingPosition = this.getKingPosition()
@@ -326,39 +374,370 @@ export default class ChessBoard {
         return false
     }
 
-    getKingPosition(){
+    isLegalMove(start, end){
 
-        // Get the king symbol
-        const kingSymbol = (this.activeColour === 'w') ? 'K' : 'k'
+        // Function checks if a move is legal
+        //  1) King is not in check
+        //  2) a piece (king or pinned piece) can not move into check
 
-        // Loop over the board
+        // Create a copy of the board
+        const boardCopy = new ChessBoard(this.fen)
+
+        // Make the move
+        boardCopy.makeMove(start, end)
+
+        // Check if the king is in chec
+        return boardCopy.isCheck() 
+    }
+
+    isCheckMate(){
+        
+        // It is check mate when the king is in check and has no legal moves
+        // and the checking piece can not be blocked or captured
+
+        const kingLegalMoves = this.getPieceMoves(this.getKingPosition())
+
+        return(
+            this.isCheck() && 
+            kingLegalMoves.length > 0 && 
+            !this.isCheckBlockOrCapture()
+        )
+    }
+    
+    isCheckBlockOrCapture(){
+
+        if (!this.isCheck()){
+            throw new error('Can not block or capture a "checking piece" when the king is not in check')
+        } 
+
+        // Find the chceking pieces. If there are more than 2, it is checkmate
+        const checkingPiecesPositions = this.getCheckingPieces()
+
+        if(checkingPiecesPositions.length > 1){
+            return false
+        }
+
+        // Get the checking piece position
+        const checkingPiecePosition = checkingPieces[0]
+
+        // Get positions checking piece moves
+        const blockCaputrePositions = this.getBlockCapturePositions(checkingPiecePosition)
+
+        // Check if any piece of the same colour as the king can block or capture the checking piece
+        const blockingPieces = (this.activeColour === 'w') ? 'QRBNP' : 'qrbnp'        // Notice the absence of the king
+
         for(let i = 0; i < this.board.length; i++){
 
             for (let j = 0; j < this.board[i].length; j++){
 
-                // Get the piece at the current position
                 const piece = this.board[i][j]
 
-                // Check if said piece is the king
-                if (piece === kingSymbol){
-                    return {rowIndex: i, colIndex: j}
+                if (piece !== null && blockingPieces.includes(piece)){
+
+                    const piecePosition = {rowIndex: i, colIndex: j}
+
+                    const pieceMoves = this.getPieceMoves(piecePosition)
+                    const overlappingPositions = this.getOverlappingPositions(pieceMoves, blockCaputrePositions)
+
+                    // Check that blocking move does not put the king in check
+                    overlappingPositions.filter((position) => this.isLegalMove(piecePosition, position))
+
+                    // If we have at least one valid move, the check can be blocked or captured
+                    if(overlappingPositions.length > 0){
+                        return true
+                    }
                 }
             }
         }
-        throw new Error(`${(this.activeColour === 'w') ? 'White' : 'Black'} king found on the board`)
+        // No piece can block or capture the checking piece
+        return false
     }
 
-    isCheckMae(){
+    getBlockCapturePositions(checkingPiecePosition){
+            
+        // Get the king position
+        const kingPosition = this.getKingPosition()
+
+        // Get the checking piece
+        const checkingPiece = this.getPieceAt(checkingPiecePosition)
+
+        // Get the movement vectors for the checking piece
+        const checkingVectors = PIECES[checkingPiece].movement
+
+        let positionsAlongVector = []
+
+        for (let i = 0; i < checkingVectors.length; i++){
+
+            const vector = checkingVectors[i][0]
+            const findPositionsVector = checkingVectors[i][1]
+
+            positionsAlongVector = findPositionsVector(checkingPiecePosition, vector, this.board)
+
+            if (this.includesPosition(positionsAlongVector, kingPosition)){
+                break
+            }
+        }
+
+        if (!this.includesPosition(positionsAlongVector, kingPosition)){
+            throw new Error('"Checking piece" does not attack the king')
+        }
+
+        // 3) Remove the position of the king (it is not a valid move)
+        positionsAlongVector.filter((position) => !(    // Apply not operator 
+            position.rowIndex === kingPosition.rowIndex && position.colIndex === kingPosition.colIndex      // find the king position
+            )
+        )
+
+        // 4) Add the position of checking piece (a capture is a valid move)
+        positionsAlongVector.push(checkingPiecePosition)
+
+        return positionsAlongVector
+    }
+
+
+
+
+    /* Executing verified moves */
+
+    makeMove(startPosition, endPosition, promotionPiece = null){
+
+        // Get the possible moves for the piece
+        const {regular, enpassant, castles} = this.getAllMoves(startPosition)
+
+        // Check if the end position is a possible move
+        if (this.includesPosition(regular, endPosition)){
+            this.makeRegularMove(startPosition, endPosition, promotionPiece)
+        }
+        else if (this.includesPosition(enpassant, endPosition)){
+            this.makeEnpassantMove(startPosition, endPosition)
+        }
+        else if (this.includesPosition(castles, endPosition)){
+            this.makeCastlesMove(startPosition, endPosition)
+        }
+        else {
+            throw new Error("Invalid move")
+        }
+    }
+
+    makeRegularMove(startPosition, endPosition, promotionPiece){
+            
+        // Get piece
+        const piece = this.getPieceAt(startPosition)
+        const capturedPiece = this.getPieceAt(endPosition)
+        let target = piece
+
+        // Check if the move is a promotion, if so replace the piece with promoting piece
+        if (this.isPromotion(startPosition, endPosition, promotionPiece)){
+            target = promotionPiece
+        }
         
+        // Make the move by updating the board representation
+        this.board[endPosition.rowIndex][endPosition.colIndex] = target
+        this.board[startPosition.rowIndex][startPosition.colIndex] = null
 
+        // Update the FEN
+        this.updateFen(piece, capturedPiece, startPosition, endPosition)
     }
 
-    makeMove(){}
+    isPromotion(startPosition, endPosition, promotionPiece = null){
 
-    parseFen(){}
+        // Get the piece at the start position
+        const piece = this.getPieceAt(startPosition)
+        // Get the promotion options
+        const promotionOptions = (this.activeColour === 'w') ? 'QRBN' : 'qrbn'
+        //  Get the end row
+        const endRow = (this.activeColour === 'w') ? 0 : 7
+
+        // Check if promotion is specified
+        if (promotionPiece === null){
+            return false
+        }
+        // Check if the end position is at the end row and the promotion piece is valid
+        else if (   (!promotionOptions.includes(promotionPiece))    || 
+                    (endPosition.rowIndex !== endRow)               || 
+                    (!'Pp'.includes(piece))){
+
+            throw new Error("Invalid promotion")
+        }
+        // Promotion is valid
+        else {
+            return true
+        }
+    }
+
+    makeEnpassantMove(startPosition, endPosition){
+            
+        // Get the piece
+        const piece = this.getPieceAt(startPosition)
+        
+        // Get the captured piece by 
+        const capturePosition = {rowIndex: startPosition.rowIndex, colIndex: endPosition.colIndex}
+        const capturedPiece = this.getPieceAt(capturePosition)
+        
+        // Make the move by updating the board representation
+        this.board[endPosition.rowIndex][endPosition.colIndex] = piece
+        this.board[startPosition.rowIndex][startPosition.colIndex] = null
+
+        // Remove the captured piece
+        this.board[capturePosition.rowIndex][capturePosition.colIndex] = null
+
+        // Update the FEN
+        this.updateFen(piece, capturedPiece, startPosition, endPosition)
+    }
+
+    makeCastlesMove(startPosition, endPosition){
+        
+        // Get the piece
+        const piece = this.getPieceAt(startPosition)
+
+        // Get the direction of the castling move
+        const direction = (endPosition.colIndex === 2) ? 'Queenside' : 'Kingside'
+
+        // Get the rook position
+        const rookStartPosition = (direction === 'Queenside') ? {rowIndex: startPosition.rowIndex, colIndex: 0} : {rowIndex: startPosition.rowIndex, colIndex: 7}
+        
+        // Get the rook end position
+        const rookEndPosition = (direction === 'Queenside') ? {rowIndex: startPosition.rowIndex, colIndex: 3} : {rowIndex: startPosition.rowIndex, colIndex: 5}
+
+        // Make the move by updating the board representation
+        this.board[endPosition.rowIndex][endPosition.colIndex] = piece
+        this.board[startPosition.rowIndex][startPosition.colIndex] = null
+        this.board[rookEndPosition.rowIndex][rookEndPosition.colIndex] = (piece === 'K') ? 'R' : 'r'
+        this.board[rookStartPosition.rowIndex][rookStartPosition.colIndex] = null
+
+        // Update the FEN
+        this.updateFen(piece, null, startPosition, endPosition)
+    }
+
+
+    /* Updating the FEN */
+
+    updateFen(initialPiece, capturedPiece, startPosition, endPosition){
+
+        // Parse piece placement
+        this.updatePiecePlacementFromBoard()
+
+        // Update the castling availability
+        this.updateCastlingAvailability(initialPiece, startPosition)
+
+        // Update the enpassant target
+        if ('Pp'.includes(initialPiece) && Math.abs(startPosition.rowIndex - endPosition.rowIndex) === 2){
+            const file = ChessBoard.colIndexToFile(endPosition.colIndex) 
+            const rank = ChessBoard.rowIndexToRank(endPosition.rowIndex)
+            const rankBehind = ChessBoard.incrementRank(rank, (initialPiece === 'P') ? 1 : -1) 
+            this.enpassantTarget = file + rankBehind
+        }
+        else {
+            this.enpassantTarget = '-'
+        }
+        
+        // Update full move number
+        this.fullmoveNumber += (this.activeColour === 'b') ? 1 : 0
+        
+        // Reset the half move clock if the piece is a pawn or a capture is made or increment otherwise
+        const resetHalfMoveClock = (capturedPiece !== null) && !'Pp'.includes(initialPiece)
+        this.halfmoveClock = (resetHalfMoveClock) ? 0 : this.halfmoveClock + 1
+
+        // Update the active colour
+        this.activeColour = (this.activeColour === 'w') ? 'b' : 'w'
+
+        // Update the overall fen board representation
+        this.fen = this.parseFen()
+    }
+
+    updateCastlingAvailability(initialPiece, startPosition){
+
+        // No need to update castling availability if it is not possible
+        if (this.castlingAvailability === '-'){
+            return
+        }
+
+        // Remove castling availability if the king or rook moves
+        if (initialPiece === 'K'){
+            this.castlingAvailability = this.castlingAvailability.replace(/(K|Q)/g, '')
+        }
+        else if (initialPiece === 'k'){
+            this.castlingAvailability = this.castlingAvailability.replace(/(k|q)/g, '')
+        }
+        else if (initialPiece === 'R'){
+            if (startPosition.rowIndex === 7 && startPosition.colIndex === 0){
+                this.castlingAvailability = this.castlingAvailability.replace(/(Q)/g, '')
+            }
+            else if (startPosition.rowIndex === 7 && startPosition.colIndex === 7){
+                this.castlingAvailability = this.castlingAvailability.replace(/(K)/g, '')
+            }
+        }
+        else if (initialPiece === 'r'){
+            if (startPosition.rowIndex === 0 && startPosition.colIndex === 0){
+                this.castlingAvailability = this.castlingAvailability.replace(/(q)/g, '')
+            }
+            else if (startPosition.rowIndex === 0 && startPosition.colIndex === 7){
+                this.castlingAvailability = this.castlingAvailability.replace(/(k)/g, '')
+            }
+        }
+
+        // Provide default value if the castling availability is empty
+        if (this.castlingAvailability === ''){
+            this.castlingAvailability = '-'
+        }
+    }
+
+    updatePiecePlacementFromBoard(){
+
+        let piecePlacement = ''
+
+        // Loop over the board rows
+        for (let i = 0; i < this.board.length; i++){
+            let emptySquares = 0
+
+            // Loop over the board columns
+            for (let j = 0; j < this.board[i].length; j++){
+
+                const piece = this.board[i][j]
+
+                // Check if the square is empty if so increment the empty squares counter
+                if (piece === null){
+                    emptySquares += 1
+                }
+                // Otherwise add the empty squares counter to the piece placement string and reset it
+                // Add the current piece to the piece placement string
+                else {
+                    if (emptySquares > 0){
+                        piecePlacement += emptySquares.toString()
+                        emptySquares = 0
+                    }
+                    piecePlacement += piece
+                }
+            }
+
+            // If the end of the row is reached add the empty squares to the piece placement string
+            if (emptySquares > 0){
+                piecePlacement += emptySquares.toString()
+            }
+
+            // Add a '/' to separate the rows (not needed for the last row)
+            if (i < this.board.length - 1){
+                piecePlacement += '/'
+            }
+        }
+        this.piecePlacement = piecePlacement
+    }
+
+    parseFen(){
+        return [
+            this.piecePlacement, 
+            this.activeColour, 
+            this.castlingAvailability, 
+            this.enpassantTarget, 
+            this.halfmoveClock, 
+            this.fullmoveNumber
+        ].join(' ')
+    }
 
     
     
+    /* Helper functions dealing with position caculations */
+
     includesPosition(positions, position) {
         
         // Loop over the positions and check if the position is included
@@ -387,6 +766,22 @@ export default class ChessBoard {
             }
         }
         return false
+    }
+
+    getOverlappingPositions(positions_A, positions_B){
+            
+        // Loop over the positions and check if any position overlaps both arrays
+        const overlappingPositions = []
+
+        for (let i = 0; i < positions_A.length; i++){
+
+            const checkPosition = positions_A[i]
+
+            if (this.includesPosition(positions_B, checkPosition)){
+                overlappingPositions.push(checkPosition)
+            }
+        }
+        return overlappingPositions
     }
 
 }
