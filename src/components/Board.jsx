@@ -1,20 +1,9 @@
 import { useState } from "react"
 
-import DisplaySquare from "./DisplaySquare"
-import { SQUARE_BOARD_SIZE } from "../chess/chess_setup" 
+import Square from "./Square"
 import Position from "../chess/utils/Position"
 
-function formatRow(row) {
 
-    /* subtract 1 from row because board is represented as an array (starts at zero index)
-    subtract from nRows since we want lower rows displayed at the bottom of the console instead of at top*/ 
-    return (SQUARE_BOARD_SIZE - 1) - (row - 1)
-}
-
-function formatColumn(column){
-    // zero index columns
-    return column - 1
-}
 
 
 function deriveMaskSquareHighlights(selectedPiece, piecesArray){
@@ -55,13 +44,12 @@ function deriveMaskSquareHighlights(selectedPiece, piecesArray){
     return mask
 }
 
-export default function Board({ pieces, history }) {
-
+export default function Board({ chessBoard }) {
 
     const [selectedPiece, setSelectedPiece] = useState(null)
 
     // Derive the representation of the board as well as the mask
-    const board = deriveBoard(pieces)
+    const board = chessBoard.board
     const mask = (selectedPiece === null) ? null : deriveMaskSquareHighlights(selectedPiece, pieces)
 
     return(
@@ -69,18 +57,20 @@ export default function Board({ pieces, history }) {
             {board.map((row, rowIndex) => (
                 <li className = "flex" key={rowIndex}>
                     <ol className="flex justify-center">
-                        {row.map((piece, pieceIndex) => {
+                        {row.map((piece, colIndex) => {
 
-                            const maskValue = (mask === null) ? "none" : mask[rowIndex][pieceIndex]
-                            const squareColour = ((rowIndex + pieceIndex) % 2 === 0) ? "bg-[#F0D9B5]" : "bg-[#b58863]"
+                            const maskValue = (mask === null) ? "none" : mask[rowIndex][colIndex]
+                            const position = {rowIndex, colIndex}
+                            const squareColour = ((rowIndex + colIndex) % 2 === 0) ? "bg-[#F0D9B5]" : "bg-[#b58863]"
                             const squareStyles = `w-16 h-16 flex justify-center items-center ${squareColour}`
+                            
                             return (
-                                <li key={pieceIndex} className = {squareStyles}>
-                                    <DisplaySquare 
+                                <li key={colIndex} className = {squareStyles}>
+                                    <Square 
                                         piece = {piece}
                                         maskValue = {maskValue}
                                         selectedPiece={selectedPiece}
-                                        playerTurn = {turn}
+                                        position = {position}
                                     />
                                 </li>
                             )

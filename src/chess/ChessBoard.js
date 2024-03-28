@@ -1,5 +1,16 @@
 import { PIECES } from "./pieces"
 
+
+
+// Public methods
+// 1) getPieceAt(position) - returns the piece at the positionç
+// 2) getKingPosition() - returns the position of the king
+// 3) getAllMoves(position) - returns all possible moves for a piece at the position
+// 4) makeMove(startPosition, endPosition, promotionPiece) - makes a move on the board
+// 5) isCheck() - returns true if the current king is in check
+// 6) isCheckMate() - returns true if the current king is in checkmate
+
+
 export default class ChessBoard {
 
     constructor(fen){
