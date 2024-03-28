@@ -1,4 +1,3 @@
-import { SQUARE_BOARD_SIZE } from "./chess_setup"
 import { PIECES } from "./pieces"
 
 export default class ChessBoard {
@@ -19,39 +18,30 @@ export default class ChessBoard {
         this.board = this.parseBoard()
     }
 
-    /* Static Methods */
 
-    // NOT Redundant
+
+    /* Static Methods for position calculations */
+
     static rankToRowIndex(rank) {
-
-        /* subtract 1 from row because board is represented as an array (starts at zero index)
-        subtract from nRows since we want lower rows displayed at the bottom of the console instead of at top*/ 
-        return SQUARE_BOARD_SIZE - rank
+        return 8 - rank
     }
 
-    // redundant?
     static rowIndexToRank(rowIndex){
-        return SQUARE_BOARD_SIZE - rowIndex
+        return 8 - rowIndex
     }
-    
-    // NOT Redundant
+
     static fileToColIndex(file){
-    
-        // zero index columns
         return file.charCodeAt(0) - 'a'.charCodeAt(0)
     }
 
-    // redundant?
     static colIndexToFile(columnIndex){
         return String.fromCharCode(columnIndex + 'a'.charCodeAt(0))
     }
 
-    // redundant?
     static incrementRank(rank, increment){
         return rank + increment
     }
 
-    // redundant?
     static incrementFile(file, increment){
         return String.fromCharCode(file.charCodeAt(0) + increment)
     }
@@ -65,7 +55,10 @@ export default class ChessBoard {
 
         return {rowIndex, colIndex}
     }
-    
+
+
+
+    /* Board Representation */
 
     parseBoard() {
 
@@ -96,6 +89,8 @@ export default class ChessBoard {
         }
         this.board = board
     }
+
+
 
     /* Getters */
 
@@ -132,13 +127,6 @@ export default class ChessBoard {
             }
         }
         throw new Error(`${(this.activeColour === 'w') ? 'White' : 'Black'} king found on the board`)
-    }
-
-    // Redundant?
-    getRowAndColIndices(position) {
-        const rowIndex = ChessBoard.rankToRowIndex(position.rank)
-        const colIndex = ChessBoard.fileToColIndex(position.file)
-        return {rowIndex, colIndex}
     }
 
 
@@ -195,7 +183,6 @@ export default class ChessBoard {
 
         return {regular, enpassant, castles}
     }
-
 
 
 
@@ -306,7 +293,6 @@ export default class ChessBoard {
 
 
 
-
     /* Enpassant */
 
     getEnpassantPositions(position){
@@ -335,7 +321,6 @@ export default class ChessBoard {
         }
         return []
     }
-
 
 
 
@@ -493,7 +478,6 @@ export default class ChessBoard {
 
         return positionsAlongVector
     }
-
 
 
 
@@ -783,5 +767,4 @@ export default class ChessBoard {
         }
         return overlappingPositions
     }
-
 }

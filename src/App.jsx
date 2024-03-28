@@ -4,8 +4,18 @@ import GameMode from "./components/GameMode";
 import Board from "./components/Board";
 import Player from "./components/Player";
 
-import { INITIAL_PLAYERS, initChessPieces } from "./chess/chess_setup";
+import {  initChessPieces } from "./chess/chess_setup";
 
+export const INITIAL_PLAYERS = {
+    white: {
+        name: "White Player",
+        time: undefined,
+    },
+    black: {
+        name: "Black Player",
+        time: undefined,
+    }
+}
 
 function deriveActivePlayer(history){
     // If the history has an even length, it's white's turn

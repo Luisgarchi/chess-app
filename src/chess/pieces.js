@@ -17,6 +17,7 @@ export const PIECES = {
     p: {points: 1, movement: blackPawnMoves},
 }
 
+// Define how the king moves
 const kingMoves = [
     {vector: {rankComponent:  1, fileComponent:  0, restricted: true}, mechanics : basicMove},
     {vector: {rankComponent: -1, fileComponent:  0, restricted: true}, mechanics : basicMove},
@@ -28,6 +29,7 @@ const kingMoves = [
     {vector: {rankComponent: -1, fileComponent: -1, restricted: true}, mechanics : basicMove}
 ];
 
+// Define how the queen moves
 const queenMoves = [
     {vector: {rankComponent:  1, fileComponent:  0, restricted: false}, mechanics : basicMove},
     {vector: {rankComponent: -1, fileComponent:  0, restricted: false}, mechanics : basicMove},
@@ -39,6 +41,7 @@ const queenMoves = [
     {vector: {rankComponent: -1, fileComponent: -1, restricted: false}, mechanics : basicMove}
 ];
 
+// Define how the rook moves
 const rookMoves = [
     {vector: {rankComponent:  1, fileComponent:  0, restricted: false}, mechanics : basicMove},
     {vector: {rankComponent: -1, fileComponent:  0, restricted: false}, mechanics : basicMove},
@@ -46,6 +49,7 @@ const rookMoves = [
     {vector: {rankComponent:  0, fileComponent: -1, restricted: false}, mechanics : basicMove}
 ];
 
+// Define how the bishop moves
 const bishopMoves = [
     {vector: {rankComponent:  1, fileComponent:  1, restricted: false}, mechanics : basicMove},
     {vector: {rankComponent:  1, fileComponent: -1, restricted: false}, mechanics : basicMove},
@@ -53,6 +57,7 @@ const bishopMoves = [
     {vector: {rankComponent: -1, fileComponent: -1, restricted: false}, mechanics : basicMove}
 ];
 
+// Define how the knight moves
 const knightMoves = [
     {vector: {rankComponent:  2, fileComponent:  1, restricted: true}, mechanics : basicMove},
     {vector: {rankComponent:  1, fileComponent:  2, restricted: true}, mechanics : basicMove},
@@ -64,6 +69,7 @@ const knightMoves = [
     {vector: {rankComponent: -1, fileComponent: -2, restricted: true}, mechanics : basicMove}
 ];
 
+// Define how the white pawn moves
 const whitePawnRankDirection = 1
 const whitePawnMoves = [
     {vector: {rankComponent: whitePawnRankDirection, fileComponent: 0, restricted: false}, mechanics: pawnVerticalMove},
@@ -71,6 +77,7 @@ const whitePawnMoves = [
     {vector: {rankComponent: whitePawnRankDirection, fileComponent: -1, restricted: true}, mechanics: pawnCapture},
 ];
 
+// Define how the black pawn moves
 const blackPawnRankDirection = -1
 const blackPawnMoves = [
     {vector: {rankComponent: blackPawnRankDirection, fileComponent: 0, restricted: false}, mechanics: pawnVerticalMove},
@@ -80,6 +87,9 @@ const blackPawnMoves = [
 
 
 function createIsOnBoardChecker(board) {
+
+    // helper function to check if a row and column index are on the board
+
     const minRowIndex = 0
     const maxRowIndex = board.length - 1
     const minColIndex = 0
@@ -93,7 +103,10 @@ function createIsOnBoardChecker(board) {
     }
 }
 
+
 function basicMove(position, vector, board){
+
+    // Move logic that is common to all pieces except pawns
 
     // Get function to check if a file and rank are on a board
     const isOnBoard = createIsOnBoardChecker(board)
