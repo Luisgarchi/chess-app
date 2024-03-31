@@ -29,6 +29,7 @@ const pieces = {
 
 export default function DisplayPiece({ piece }) {
 
+
     return (
         <img 
             className = "absolute top-0 left-0 w-full h-full object-contain z-10" 

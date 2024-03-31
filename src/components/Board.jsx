@@ -1,57 +1,60 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
+import { GameContext } from "../GameContext"
 
 import Square from "./Square"
-import Position from "../chess/utils/Position"
+import ChessBoard from "../chess/ChessBoard"
 
-
-
-
-function deriveMaskSquareHighlights(selectedPiece, piecesArray){
+function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition){
 
     // Derive a mask that highlights squares of relevance for the selected piece
-    
     const mask = Array.from({ length: 8 }, () => Array(8).fill("none"))
 
-    // Create a hash of enemy piece positions
-    const oppositeColourPositions = new Set(
-        piecesArray
-          .filter((piece) => piece.colour !== selectedPiece.colour)
-          .map((piece) => piece.position.serialiseUCI())
-    )
-
-    const reachablePositions = selectedPiece.findReachablePositions(piecesArray)
-    // filter positions that would result in check, they need to be removed as they are illegal
-    
-
-    for(const position of reachablePositions){
-
-        // Check if the position is occupied by an enemy piece.
-        const differentColour = oppositeColourPositions.has(position.serialiseUCI())
-        // If so mark for capture otherwise otherwise mark as also "available" to move
-        const maskValue = differentColour ? "enemy" : "available"
-
-        const row = formatRow(position.rank)
-        const column = formatColumn(Position.fileToNum(position.file))
-
-        mask[row][column] = maskValue
+    // Check if the king is in check add check to mask
+    if (chessBoard.isCheck()){
+        const kingPosition = chessBoard.getKingPosition()
+        mask[kingPosition.rowIndex][kingPosition.colIndex] = "check"
     }
 
-    // Add the selected piece to the mask
-    const selectedPieceRow = formatRow(selectedPiece.position.rank)
-    const selectedPieceColumn = formatColumn(Position.fileToNum(selectedPiece.position.file))
-    mask[selectedPieceRow][selectedPieceColumn] = "selected"
+    // If no piece is selected, return the mask as is
+    if (selectedPiecePosition === null) return mask
 
+    // Set the selected piece mask
+    const {rowIndex, colIndex} = selectedPiecePosition
+    mask[rowIndex][colIndex] = "selected"
+
+    // Get all the squares the selected piece can move to
+    const {regular, enpassant, castles} = chessBoard.getAllMoves(selectedPiecePosition)
+    const pieceMoves = [...regular, ...enpassant, ...castles]
+
+    // Derive mask by looping through all squares on board
+    for(const position of pieceMoves){
+
+        const {rowIndex, colIndex} = position
+
+        // If their is no piece on square it is vacant
+        if (chessBoard.board[rowIndex][colIndex] === null){
+            mask[rowIndex][colIndex] = "vacant"
+        }
+        // Otherwise an enemy piece is on the square
+        else {
+            mask[rowIndex][colIndex] = "occupied"
+        }
+    }
     return mask
 }
 
-export default function Board({ chessBoard }) {
+export default function Board() {
 
-    const [selectedPiece, setSelectedPiece] = useState(null)
+    const [selectedPiece, setSelectedPiece] = useState({rowIndex: 7, colIndex: 1})
+    const {fen, active} = useContext(GameContext)
+
+    const chessBoard = new ChessBoard(fen)
 
     // Derive the representation of the board as well as the mask
     const board = chessBoard.board
-    const mask = (selectedPiece === null) ? null : deriveMaskSquareHighlights(selectedPiece, pieces)
+    const mask = deriveMaskSquareHighlights(chessBoard, selectedPiece)
 
+    
     return(
         <ol className="flex flex-col justify-center items-center">
             {board.map((row, rowIndex) => (
@@ -59,7 +62,7 @@ export default function Board({ chessBoard }) {
                     <ol className="flex justify-center">
                         {row.map((piece, colIndex) => {
 
-                            const maskValue = (mask === null) ? "none" : mask[rowIndex][colIndex]
+                            const maskValue = mask[rowIndex][colIndex]
                             const position = {rowIndex, colIndex}
                             const squareColour = ((rowIndex + colIndex) % 2 === 0) ? "bg-[#F0D9B5]" : "bg-[#b58863]"
                             const squareStyles = `w-16 h-16 flex justify-center items-center ${squareColour}`
@@ -71,6 +74,7 @@ export default function Board({ chessBoard }) {
                                         maskValue = {maskValue}
                                         selectedPiece={selectedPiece}
                                         position = {position}
+                                        turn = {chessBoard.activeColour}
                                     />
                                 </li>
                             )

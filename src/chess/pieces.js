@@ -1,21 +1,4 @@
-export const PIECES = {
 
-    // white pieces in uppercase
-    K: {points: 0, movement: kingMoves},
-    Q: {points: 9, movement: queenMoves},
-    R: {points: 5, movement: rookMoves},
-    B: {points: 3, movement: bishopMoves},
-    N: {points: 3, movement: knightMoves},
-    P: {points: 1, movement: whitePawnMoves},
-
-    // black pieces in lowercase
-    k: {points: 0, movement: kingMoves},
-    q: {points: 9, movement: queenMoves},
-    r: {points: 5, movement: rookMoves},
-    b: {points: 3, movement: bishopMoves},
-    n: {points: 3, movement: knightMoves},
-    p: {points: 1, movement: blackPawnMoves},
-}
 
 // Define how the king moves
 const kingMoves = [
@@ -86,6 +69,26 @@ const blackPawnMoves = [
 ];
 
 
+export const PIECES = {
+
+    // white pieces in uppercase
+    K: {points: 0, movement: kingMoves},
+    Q: {points: 9, movement: queenMoves},
+    R: {points: 5, movement: rookMoves},
+    B: {points: 3, movement: bishopMoves},
+    N: {points: 3, movement: knightMoves},
+    P: {points: 1, movement: whitePawnMoves},
+
+    // black pieces in lowercase
+    k: {points: 0, movement: kingMoves},
+    q: {points: 9, movement: queenMoves},
+    r: {points: 5, movement: rookMoves},
+    b: {points: 3, movement: bishopMoves},
+    n: {points: 3, movement: knightMoves},
+    p: {points: 1, movement: blackPawnMoves},
+}
+
+
 function createIsOnBoardChecker(board) {
 
     // helper function to check if a row and column index are on the board
@@ -103,7 +106,6 @@ function createIsOnBoardChecker(board) {
     }
 }
 
-
 function basicMove(position, vector, board){
 
     // Move logic that is common to all pieces except pawns
@@ -111,7 +113,7 @@ function basicMove(position, vector, board){
     // Get function to check if a file and rank are on a board
     const isOnBoard = createIsOnBoardChecker(board)
 
-    rowColPositions = []
+    const rowColPositions = []
     let {rowIndex, colIndex} = position
     const piece = board[rowIndex][colIndex]
 
@@ -155,7 +157,7 @@ function pawnVerticalMove(position, vector, board){
     // Pawns will never be on the first or last ranks, 
     // therefore there is no need to check if vertical movment will be on board
 
-    rowColPositions = []
+    const rowColPositions = []
     let {rowIndex, colIndex} = position
     const piece = board[rowIndex][colIndex]
 
@@ -187,7 +189,7 @@ function pawnCapture(position, vector, board){
     // Get function to check if a file and rank are on a board
     const isOnBoard = createIsOnBoardChecker(board)
 
-    rowColPositions = []
+    const rowColPositions = []
     let {rowIndex, colIndex} = position
     const piece = board[rowIndex][colIndex]
 

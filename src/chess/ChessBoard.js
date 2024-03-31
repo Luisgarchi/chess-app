@@ -98,7 +98,7 @@ export default class ChessBoard {
             }
             board.push(rowArray)
         }
-        this.board = board
+        return board
     }
 
 
@@ -159,8 +159,8 @@ export default class ChessBoard {
         for (let i = 0; i < pieceMoveVectors.length; i++){
 
             // get the vector and associated function used to calculate positions along said vector
-            const vector = pieceMoveVectors[i][0]
-            const findPositionsVector = pieceMoveVectors[i][1]
+            const vector = pieceMoveVectors[i].vector
+            const findPositionsVector = pieceMoveVectors[i].mechanics
 
             // find and store the positions along vector for the current piece on the board
             const positionsVector = findPositionsVector(position, vector, this.board)
@@ -191,7 +191,7 @@ export default class ChessBoard {
 
         const castles = this.getCastlesPositions(position).filter(
             (endPosition) => this.isLegalMove(position, endPosition))
-
+        
         return {regular, enpassant, castles}
     }
 
@@ -199,7 +199,7 @@ export default class ChessBoard {
 
     /* Castling */
 
-    getCastles(position){
+    getCastlesPositions(position){
 
         const positions = []
 
@@ -380,10 +380,11 @@ export default class ChessBoard {
         const boardCopy = new ChessBoard(this.fen)
 
         // Make the move
-        boardCopy.makeMove(start, end)
+        boardCopy.board[end.rowIndex][end.colIndex] = boardCopy.board[start.rowIndex][start.colIndex]
+        boardCopy.board[start.rowIndex][start.colIndex] = null
 
-        // Check if the king is in chec
-        return boardCopy.isCheck() 
+        // A move is legal if the king is not in check
+        return !boardCopy.isCheck() 
     }
 
     isCheckMate(){

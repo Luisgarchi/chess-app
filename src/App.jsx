@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import GameMode from "./components/GameMode";
 import Player from "./components/Player";
-
+import Board from "./components/Board";
 import ChessBoard from "./chess/ChessBoard";
+import { GameContext } from "./GameContext";
 
-
-export const INITIAL_PLAYERS = {
+const INITIAL_PLAYERS = {
     white: {
         name: "White Player",
         time: undefined,
@@ -17,8 +17,8 @@ export const INITIAL_PLAYERS = {
     }
 }
 
+const startNotation = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-const startingFenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 export default function App(){
 
@@ -26,12 +26,14 @@ export default function App(){
     const [players, setPlayers] = useState(INITIAL_PLAYERS)
     const [chessLogs, setChessLogs] = useState([{
         moves: null,
-        board: startingFenPosition,
+        fen: startNotation,
     }])
+    const [gameDisplay, setGameDisplay] = useState(chessLogs[chessLogs.length - 1].fen)
+
 
     // Derive all the relevant game states
-    const gameState = chessLogs[chessLogs.length - 1].board
-    const chessBoard = new ChessBoard(gameState)
+    const currentGame = chessLogs[chessLogs.length - 1].fen
+    const chessBoard = new ChessBoard(currentGame)
 
     const isWinner = chessBoard.isCheckMate()
     // const isDraw = chessBoard.isDraw()
@@ -49,6 +51,12 @@ export default function App(){
         })
     }
 
+    const isBoardCurrent = gameDisplay === currentGame
+
+    const ctxGame = {
+        fen: gameDisplay,
+        active: isBoardCurrent,
+    }
 
     return (
         <div className="bg-stone-200 w-screen h-screen flex justify-center items-center">
@@ -58,7 +66,10 @@ export default function App(){
                 </div>
                 <div className="flex flex-col items-center justify-center gap-4">
                     <Player initialName={players.black.name} colour="black" onChangeName={handlePlayerNameChange}/>
-                    <ChessBoard chessBoard = {chessBoard}/>
+                    
+                    <GameContext.Provider value={ctxGame}>
+                        <Board />
+                    </GameContext.Provider>
                     <Player initialName={players.white.name} colour="white" onChangeName={handlePlayerNameChange}/>
                 </div>
             </div>
