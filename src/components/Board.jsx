@@ -4,84 +4,67 @@ import { GameContext } from "../GameContext"
 import Square from "./Square"
 import ChessBoard from "../chess/ChessBoard"
 
-function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition){
+// Generates a mask to highlight relevant squares based on the selected piece and board state
+function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition) {
+    const mask = Array.from({ length: 8 }, () => Array(8).fill("none"));
 
-    // Derive a mask that highlights squares of relevance for the selected piece
-    const mask = Array.from({ length: 8 }, () => Array(8).fill("none"))
-
-    // Check if the king is in check add check to mask
-    if (chessBoard.isCheck()){
-        const kingPosition = chessBoard.getKingPosition()
-        mask[kingPosition.rowIndex][kingPosition.colIndex] = "check"
+    // Highlight the king's position if in check
+    if (chessBoard.isCheck()) {
+        const kingPosition = chessBoard.getKingPosition();
+        mask[kingPosition.rowIndex][kingPosition.colIndex] = "check";
     }
 
-    // If no piece is selected, return the mask as is
-    if (selectedPiecePosition === null) return mask
+    if (selectedPiecePosition === null) return mask; // Early return if no piece is selected
 
-    // Set the selected piece mask
-    const {rowIndex, colIndex} = selectedPiecePosition
-    mask[rowIndex][colIndex] = "selected"
+    // Highlight the selected piece
+    const { rowIndex, colIndex } = selectedPiecePosition;
+    mask[rowIndex][colIndex] = "selected";
 
-    // Get all the squares the selected piece can move to
-    const {regular, enpassant, castles} = chessBoard.getAllMoves(selectedPiecePosition)
-    const pieceMoves = [...regular, ...enpassant, ...castles]
+    // Calculate and highlight valid moves for the selected piece
+    const moves = chessBoard.getAllMoves(selectedPiecePosition);
+    const pieceMoves = [...moves.regular, ...moves.enpassant, ...moves.castles];
 
-    // Derive mask by looping through all squares on board
-    for(const position of pieceMoves){
+    pieceMoves.forEach(({ rowIndex, colIndex }) => {
+        mask[rowIndex][colIndex] = chessBoard.board[rowIndex][colIndex] === null ? "vacant" : "occupied";
+    });
 
-        const {rowIndex, colIndex} = position
-
-        // If their is no piece on square it is vacant
-        if (chessBoard.board[rowIndex][colIndex] === null){
-            mask[rowIndex][colIndex] = "vacant"
-        }
-        // Otherwise an enemy piece is on the square
-        else {
-            mask[rowIndex][colIndex] = "occupied"
-        }
-    }
-    return mask
+    return mask;
 }
 
 export default function Board() {
+    const [selectedPiecePosition, setSelectedPiecePosition] = useState(null);
+    const { fen } = useContext(GameContext);
 
-    const [selectedPiece, setSelectedPiece] = useState({rowIndex: 7, colIndex: 1})
-    const {fen, active} = useContext(GameContext)
+    const chessBoard = new ChessBoard(fen);
+    const mask = deriveMaskSquareHighlights(chessBoard, selectedPiecePosition);
 
-    const chessBoard = new ChessBoard(fen)
-
-    // Derive the representation of the board as well as the mask
-    const board = chessBoard.board
-    const mask = deriveMaskSquareHighlights(chessBoard, selectedPiece)
-
-    
-    return(
+    return (
         <ol className="flex flex-col justify-center items-center">
-            {board.map((row, rowIndex) => (
-                <li className = "flex" key={rowIndex}>
+            {chessBoard.board.map((row, rowIndex) => (
+                <li className="flex" key={rowIndex}>
                     <ol className="flex justify-center">
                         {row.map((piece, colIndex) => {
+                            const maskValue = mask[rowIndex][colIndex];
+                            const position = { rowIndex, colIndex };
+                            const squareColor = (rowIndex + colIndex) % 2 === 0 ? "bg-[#F0D9B5]" : "bg-[#b58863]";
+                            const squareStyles = `w-16 h-16 flex justify-center items-center ${squareColor}`;
 
-                            const maskValue = mask[rowIndex][colIndex]
-                            const position = {rowIndex, colIndex}
-                            const squareColour = ((rowIndex + colIndex) % 2 === 0) ? "bg-[#F0D9B5]" : "bg-[#b58863]"
-                            const squareStyles = `w-16 h-16 flex justify-center items-center ${squareColour}`
-                            
                             return (
-                                <li key={colIndex} className = {squareStyles}>
+                                <li key={colIndex} className={squareStyles}>
                                     <Square 
-                                        piece = {piece}
-                                        maskValue = {maskValue}
-                                        selectedPiece={selectedPiece}
-                                        position = {position}
-                                        turn = {chessBoard.activeColour}
+                                        piece={piece}
+                                        maskValue={maskValue}
+                                        selectedPiecePosition={selectedPiecePosition}
+                                        setNewPiece={setSelectedPiecePosition}
+                                        position={position}
+                                        turn={chessBoard.activeColour}
                                     />
                                 </li>
-                            )
+                            );
                         })}
                     </ol>
                 </li>
             ))}
         </ol>
-    )
+    );
 }

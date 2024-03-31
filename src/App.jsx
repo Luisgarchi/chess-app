@@ -25,7 +25,7 @@ export default function App(){
     // Define state hooks
     const [players, setPlayers] = useState(INITIAL_PLAYERS)
     const [chessLogs, setChessLogs] = useState([{
-        moves: null,
+        move: null,
         fen: startNotation,
     }])
     const [gameDisplay, setGameDisplay] = useState(chessLogs[chessLogs.length - 1].fen)
@@ -51,11 +51,36 @@ export default function App(){
         })
     }
 
+    function handleMakeMove(start, end){
+
+        // Make the move on the board
+        chessBoard.makeMove(start, end)
+        // Get the new fen
+        const newFen = chessBoard.fen
+
+        // Derive the move in algebraic notation
+        const moveStart = ChessBoard.toAlgebraicNotation(start)
+        const moveEnd = ChessBoard.toAlgebraicNotation(end)
+        const move = `${moveStart}${moveEnd}`
+        
+        // Update the logs
+        setChessLogs((prevLogs) => {
+            const newLog = {
+                move: move,
+                fen: newFen,
+            }
+            return [...prevLogs, newLog]
+        })
+        // Update the display
+        setGameDisplay(newFen)
+    }
+
     const isBoardCurrent = gameDisplay === currentGame
 
     const ctxGame = {
         fen: gameDisplay,
         active: isBoardCurrent,
+        makeMove: handleMakeMove,
     }
 
     return (

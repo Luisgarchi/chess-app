@@ -67,6 +67,13 @@ export default class ChessBoard {
         return {rowIndex, colIndex}
     }
 
+    static toAlgebraicNotation(position) {
+        const file = ChessBoard.colIndexToFile(position.colIndex)
+        const rank = ChessBoard.rowIndexToRank(position.rowIndex)
+
+        return file + rank
+    }
+
 
 
     /* Board Representation */
@@ -249,13 +256,18 @@ export default class ChessBoard {
         const startColIndex = initialPosition.colIndex
         const endColIndex = endPosition.colIndex
 
+        // Check if the castling is kingside or queenside
+        const isKingSide = (startColIndex < endColIndex)
+        const direction = (isKingSide) ? 1 : -1
+
         // Get the smaller and larger column indices
-        const small = (startColIndex > endColIndex) ? endColIndex : startColIndex
-        const big = (startColIndex > endColIndex) ? startColIndex : endColIndex
+        const numberOfSquares = Math.abs(startColIndex - endColIndex)
 
         const positions = []
-        for (let i = small; i <= big; i++){
-            positions.push({rowIndex, colIndex: i + 1})
+        for (let i = 1; i <= numberOfSquares; i++){
+
+            const newColIndex = startColIndex + i * direction
+            positions.push({rowIndex, colIndex: newColIndex})
         }
         return positions
     }
@@ -400,6 +412,41 @@ export default class ChessBoard {
             !this.isCheckBlockOrCapture()
         )
     }
+
+    getCheckingPieces(){
+            
+        // Get the king position
+        const kingPosition = this.getKingPosition()
+
+        // Get the opponent pieces
+        const opponentPieces = (this.activeColour === 'w') ? 'kqrbnp' : 'KQRBNP'
+
+        const checkingPieces = []
+
+        // Loop over the board
+        for(let i = 0; i < this.board.length; i++){
+
+            for (let j = 0; j < this.board[i].length; j++){
+
+                // Get the piece at the current position
+                const piece = this.board[i][j]
+
+                // Check if said piece is an opponent piece
+                if (opponentPieces.includes(piece)){
+
+                    // Get the squares controlled by the opponent piece
+                    const opponentPosition = {rowIndex: i, colIndex: j}
+                    const controllingSquares = this.getPieceMoves(opponentPosition)
+
+                    // Check if the king is in any of the squares controlled by the opponent
+                    if (this.includesPosition(controllingSquares, kingPosition)){
+                        checkingPieces.push(opponentPosition)
+                    }
+                }
+            }
+        }
+        return checkingPieces
+    }
     
     isCheckBlockOrCapture(){
 
@@ -408,9 +455,9 @@ export default class ChessBoard {
         } 
 
         // Find the chceking pieces. If there are more than 2, it is checkmate
-        const checkingPiecesPositions = this.getCheckingPieces()
+        const checkingPieces = this.getCheckingPieces()
 
-        if(checkingPiecesPositions.length > 1){
+        if(checkingPieces.length > 1){
             return false
         }
 
@@ -465,8 +512,8 @@ export default class ChessBoard {
 
         for (let i = 0; i < checkingVectors.length; i++){
 
-            const vector = checkingVectors[i][0]
-            const findPositionsVector = checkingVectors[i][1]
+            const vector = checkingVectors[i].vector
+            const findPositionsVector = checkingVectors[i].mechanics
 
             positionsAlongVector = findPositionsVector(checkingPiecePosition, vector, this.board)
 
@@ -519,7 +566,7 @@ export default class ChessBoard {
             
         // Get piece
         const piece = this.getPieceAt(startPosition)
-        const capturedPiece = this.getPieceAt(endPosition)
+        const capturedPiece = this.board[endPosition.rowIndex][endPosition.colIndex]
         let target = piece
 
         // Check if the move is a promotion, if so replace the piece with promoting piece
@@ -568,7 +615,7 @@ export default class ChessBoard {
         
         // Get the captured piece by 
         const capturePosition = {rowIndex: startPosition.rowIndex, colIndex: endPosition.colIndex}
-        const capturedPiece = this.getPieceAt(capturePosition)
+        const capturedPiece = this.board[endPosition.rowIndex][endPosition.colIndex]
         
         // Make the move by updating the board representation
         this.board[endPosition.rowIndex][endPosition.colIndex] = piece
@@ -620,7 +667,7 @@ export default class ChessBoard {
         if ('Pp'.includes(initialPiece) && Math.abs(startPosition.rowIndex - endPosition.rowIndex) === 2){
             const file = ChessBoard.colIndexToFile(endPosition.colIndex) 
             const rank = ChessBoard.rowIndexToRank(endPosition.rowIndex)
-            const rankBehind = ChessBoard.incrementRank(rank, (initialPiece === 'P') ? 1 : -1) 
+            const rankBehind = ChessBoard.incrementRank(rank, (initialPiece === 'P') ? -1 : 1) 
             this.enpassantTarget = file + rankBehind
         }
         else {

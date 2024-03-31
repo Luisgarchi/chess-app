@@ -53,7 +53,7 @@ const knightMoves = [
 ];
 
 // Define how the white pawn moves
-const whitePawnRankDirection = 1
+const whitePawnRankDirection = -1
 const whitePawnMoves = [
     {vector: {rankComponent: whitePawnRankDirection, fileComponent: 0, restricted: false}, mechanics: pawnVerticalMove},
     {vector: {rankComponent: whitePawnRankDirection, fileComponent: 1, restricted: true}, mechanics: pawnCapture},
@@ -61,7 +61,7 @@ const whitePawnMoves = [
 ];
 
 // Define how the black pawn moves
-const blackPawnRankDirection = -1
+const blackPawnRankDirection = 1
 const blackPawnMoves = [
     {vector: {rankComponent: blackPawnRankDirection, fileComponent: 0, restricted: false}, mechanics: pawnVerticalMove},
     {vector: {rankComponent: blackPawnRankDirection, fileComponent: 1, restricted: true}, mechanics: pawnCapture},
@@ -139,7 +139,7 @@ function basicMove(position, vector, board){
     // Do a last check for restricted vectors as well as if the square is occupied by a piece
 
     // Get the pieces of the same colour as the piece
-    const colour = (piece === piece.toUpperCase()) ? "KQRBKP" : "kqrbkp"
+    const colour = (piece === piece.toUpperCase()) ? "KQRBNP" : "kqrbnp"
 
     // We first need to check the square is on the board.
     // The check if either the square is vacant (null) or if it is occupied by a piece of the opposite colour (hence not operator)
@@ -162,7 +162,7 @@ function pawnVerticalMove(position, vector, board){
     const piece = board[rowIndex][colIndex]
 
     // Calculate and check next position after moving once along a vector
-    const isOnStartRank = (piece === piece.toUpperCase()) ? (board.length - 2 === rowIndex) : (rowIndex === 2)
+    const isOnStartRank = (piece === piece.toUpperCase()) ? (board.length - 2 === rowIndex) : (rowIndex === 1)
 
     // If the pawn is on the starting rank, it can move 2 squares
     const iterationLimit = (isOnStartRank) ? 2 : 1
@@ -197,7 +197,7 @@ function pawnCapture(position, vector, board){
     rowIndex += vector.rankComponent
     colIndex += vector.fileComponent
 
-    const oppositeColour = (piece === piece.toUpperCase()) ? "kqrbkp" : "KQRBKP"
+    const oppositeColour = (piece === piece.toUpperCase()) ? "kqrbnp" : "KQRBNP"
 
     // Check if the square is on the board
     if (isOnBoard(rowIndex, colIndex) && oppositeColour.includes(board[rowIndex][colIndex])){
