@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import kingWhite from '../assets/kingWhite.svg'
 import kingBlack from '../assets/kingBlack.svg'
 
-export default function Player({ initialName, colour, onChangeName }) {
+export default function Player({ initialName, colour, onChangeName, time }) {
 
     // Define state hooks
     const [name, setName] = useState(initialName)
@@ -56,7 +56,7 @@ export default function Player({ initialName, colour, onChangeName }) {
                     {isEditing ? "Save" : "Edit Name"}
                 </button>
             </div>
-            <span>{Time}</span>
+            <span>{time}</span>
         </div>
     )
 }

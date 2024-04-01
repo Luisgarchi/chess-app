@@ -31,12 +31,13 @@ function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition) {
     return mask;
 }
 
-export default function Board() {
+export default function Board({ fen }) {
     const [selectedPiecePosition, setSelectedPiecePosition] = useState(null);
     const { fen } = useContext(GameContext);
 
     const chessBoard = new ChessBoard(fen);
     const mask = deriveMaskSquareHighlights(chessBoard, selectedPiecePosition);
+    console.log('refreshing board')
 
     return (
         <ol className="flex flex-col justify-center items-center">
