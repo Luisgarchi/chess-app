@@ -9,11 +9,11 @@ import { GameContext } from "./GameContext";
 const INITIAL_PLAYERS = {
     white: {
         name: "White Player",
-        time: undefined,
+        time: 120,
     },
     black: {
         name: "Black Player",
-        time: undefined,
+        time: 120,
     }
 }
 
@@ -23,20 +23,34 @@ const startNotation = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 export default function App(){
 
     // Define state hooks
+    const { whiteTime, blackTime, startTimer, stopTimer, resetTimers } = useChessTimers(INITIAL_TIME, INITIAL_TIME);
     const [players, setPlayers] = useState(INITIAL_PLAYERS)
-    const [chessLogs, setChessLogs] = useState([{
-        move: null,
-        fen: startNotation,
-    }])
+    const [chessLogs, setChessLogs] = useState([{ move: null, fen: startNotation }])
     const [gameDisplay, setGameDisplay] = useState(chessLogs[chessLogs.length - 1].fen)
 
+    const [gameOver, setGameOver] = useState(false);
+    const [gameResult, setGameResult] = useState(null)
 
     // Derive all the relevant game states
     const currentGame = chessLogs[chessLogs.length - 1].fen
     const chessBoard = new ChessBoard(currentGame)
-
-    const isWinner = chessBoard.isCheckMate()
+    const isCheckMate = chessBoard.isCheckMate()
+    const turn = chessBoard.activeColour
     // const isDraw = chessBoard.isDraw()
+
+
+    // Check if the game is over
+    useEffect(() => {
+        if (isCheckMate) {
+            // Game ends due to checkmate, so the current player wins
+            setGameOver(true);
+            setGameResult(turn === 'w' ? 'white-wins' : 'black-wins');
+        } else if (whiteTime === 0 || blackTime === 0) {
+            // Game ends due to time running out, so the player with time left wins
+            setGameOver(true);
+            setGameResult(whiteTime === 0 ? 'black-wins' : 'white-wins');
+        }
+    }, [turn, whiteTime, blackTime, isCheckMate])
 
 
     // Define event handlers
@@ -73,6 +87,11 @@ export default function App(){
         })
         // Update the display
         setGameDisplay(newFen)
+
+
+        const nextTurn = turn === 'w' ? 'b' : 'w';
+        stopTimer();
+        startTimer(nextTurn);
     }
 
     const isBoardCurrent = gameDisplay === currentGame

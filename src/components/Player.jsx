@@ -56,7 +56,7 @@ export default function Player({ initialName, colour, onChangeName }) {
                     {isEditing ? "Save" : "Edit Name"}
                 </button>
             </div>
-            <span>Timer</span>
+            <span>{Time}</span>
         </div>
     )
 }
