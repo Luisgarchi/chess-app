@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export default function useChessTimers(initialWhiteTime, initialBlackTime){
+export default function useChessTimers(initialWhiteTime, initialBlackTime) {
     const [whiteTime, setWhiteTime] = useState(initialWhiteTime);
     const [blackTime, setBlackTime] = useState(initialBlackTime);
     const [isWhiteTimerActive, setIsWhiteTimerActive] = useState(false);
@@ -48,5 +48,12 @@ export default function useChessTimers(initialWhiteTime, initialBlackTime){
         setBlackTime(initialBlackTime);
     }, [initialWhiteTime, initialBlackTime]);
 
-    return { whiteTime, blackTime, startTimer, stopTimer, resetTimers };
-};
+    // Added function to initialize timers
+    const initTimers = useCallback((newWhiteTime, newBlackTime) => {
+        setWhiteTime(newWhiteTime);
+        setBlackTime(newBlackTime);
+    }, []);
+
+    // Return the added function alongside the existing ones
+    return { whiteTime, blackTime, startTimer, stopTimer, resetTimers, initTimers };
+}

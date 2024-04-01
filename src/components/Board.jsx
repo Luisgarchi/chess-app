@@ -31,13 +31,12 @@ function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition) {
     return mask;
 }
 
-export default function Board({ fen }) {
+export default function Board() {
     const [selectedPiecePosition, setSelectedPiecePosition] = useState(null);
     const { fen } = useContext(GameContext);
 
     const chessBoard = new ChessBoard(fen);
     const mask = deriveMaskSquareHighlights(chessBoard, selectedPiecePosition);
-    console.log('refreshing board')
 
     return (
         <ol className="flex flex-col justify-center items-center">
@@ -45,6 +44,7 @@ export default function Board({ fen }) {
                 <li className="flex" key={rowIndex}>
                     <ol className="flex justify-center">
                         {row.map((piece, colIndex) => {
+                            
                             const maskValue = mask[rowIndex][colIndex];
                             const position = { rowIndex, colIndex };
                             const squareColor = (rowIndex + colIndex) % 2 === 0 ? "bg-[#F0D9B5]" : "bg-[#b58863]";
