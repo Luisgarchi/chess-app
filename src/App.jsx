@@ -5,28 +5,23 @@ import Player from "./components/Player";
 import {CurrentGame} from "./components/CurrentGame";
 import ChessBoard from "./chess/ChessBoard";
 import useChessTimers from "./useChessTimers";
-
-const INITIAL_PLAYERS = {
-    white: {
-        name: "White Player",
-        time: 120,
-    },
-    black: {
-        name: "Black Player",
-        time: 120,
-    }
-}
-
+import GameStart from "./components/modals/GameStart";
+import Modal from "./components/Modal";
 const startNotation = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
- const INITIAL_TIME = 120;
+const INITIAL_TIME = 300;
+
+ const INITIAL_PLAYERS = {
+    white: "Player 1",
+    black: "Player 2",
+}
 
 export default function App(){
 
     // Define state hooks
-    const { whiteTime, blackTime, startTimer, stopTimer, resetTimers, initTimers } = useChessTimers(undefined, undefined);
+    const { whiteTime, blackTime, startTimer, stopTimer, resetTimers, initTimers } = useChessTimers(INITIAL_TIME, INITIAL_TIME);
     
-    const [players, setPlayers] = useState(INITIAL_PLAYERS)
+    const [players, setPlayers] = useState({...INITIAL_PLAYERS})
     const [chessLogs, setChessLogs] = useState([{ move: null, fen: startNotation }])
     const [gameDisplay, setGameDisplay] = useState(chessLogs[chessLogs.length - 1].fen)
     
@@ -63,14 +58,7 @@ export default function App(){
 
     // Define event handlers
     function handlePlayerNameChange(colour, newName){
-        setPlayers((prevPlayers) => {
-            const newPlayer = prevPlayers[colour]
-            newPlayer.name = newName
-            return {
-                ...prevPlayers,
-                [colour]: newPlayer
-            }
-        })
+        setPlayers(prevPlayers => ({...prevPlayers, [colour]: newName}));  
     }
 
     const handleMakeMove = useCallback((start, end) => {
@@ -121,20 +109,47 @@ export default function App(){
         active: isBoardCurrent,
         makeMove: handleMakeMove,
     }), [gameDisplay, isBoardCurrent, handleMakeMove])
+    
+    const [isModalOpen, setIsModalOpen] = useState(gameStatus ==="not-started" || gameStatus ==="game-over")
 
 
+    function handleGameConfig(player1, player2, time){
+        initTimers(time, time)
+        setPlayers({white: player1, black: player2})
+        setIsModalOpen(false)
+    }
+
+    function handleGameDefault(){
+        initTimers(INITIAL_TIME, INITIAL_TIME)
+        setPlayers({white: "Player 1", black: "Player 2"})
+        setIsModalOpen(false)
+    }
+    console.log(players)
     return (
-        <div className="bg-stone-200 w-screen h-screen flex justify-center items-center">
-            <div className="flex gap-4">
-                <div className="flex flex-col items-center justify-center">
-                    <GameMode onChangeTime = {handleTimeChange} gameStatus = {gameStatus}/>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-4">
-                    <Player initialName={players.black.name} colour="black" onChangeName={handlePlayerNameChange} time = {blackTime}/>
-                    <CurrentGame value={ctxGame} />
-                    <Player initialName={players.white.name} colour="white" onChangeName={handlePlayerNameChange} time = {whiteTime}/>
+        <>
+            <Modal open={isModalOpen} onClose={(handleGameDefault)}>
+                {(gameStatus ==="not-started") && <GameStart 
+                    configGame={handleGameConfig}
+                    defaultGame = {handleGameDefault} 
+                    initNames = {players}
+                />}
+                {(gameStatus ==="game-over") && <RestartConfirmation 
+                    onRestart={() => handleRestart(time)} 
+                    onCancel={closeModal} 
+                />}
+            </Modal>
+            <div className="bg-stone-200 w-screen h-screen flex justify-center items-center">
+                <div className="flex gap-4">
+                    <div className="flex flex-col items-center justify-center">
+                        <GameMode onChangeTime = {handleTimeChange} gameStatus = {gameStatus}/>
+                    </div>
+                    <div className="flex flex-col items-center justify-center gap-4">
+                        <Player initialName={players.black} colour="black" onChangeName={handlePlayerNameChange} time = {blackTime}/>
+                        <CurrentGame value={ctxGame} />
+                        <Player initialName={players.white} colour="white" onChangeName={handlePlayerNameChange} time = {whiteTime}/>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }

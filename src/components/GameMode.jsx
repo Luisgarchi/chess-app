@@ -1,5 +1,5 @@
 import Modal from "./Modal";
-import RestartConfirmation from "./RestartConfirmation";
+import RestartConfirmation from "./modals/RestartConfirmation";
 
 import { useState } from "react";
 

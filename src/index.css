@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes pulsateBorder {
+    0%, 100% {
+      outline-width: 2px;
+    }
+    50% {
+      outline-width: 5px;
+    }
+}
+  
+.button-pulsate {
+    animation: pulsateBorder 2s ease-in-out infinite;
+}
+
+.button-pulsate:hover {
+    animation: none;
+    
+}
