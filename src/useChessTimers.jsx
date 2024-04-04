@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export default function useChessTimers(initialWhiteTime, initialBlackTime) {
-    const [whiteTime, setWhiteTime] = useState(initialWhiteTime);
-    const [blackTime, setBlackTime] = useState(initialBlackTime);
+export default function useChessTimers(stateTime, stateIncrement) {
+    const [whiteTime, setWhiteTime] = useState(stateTime);
+    const [blackTime, setBlackTime] = useState(stateTime);
+    const [increment, setIncrement] = useState(stateIncrement)
     const [isWhiteTimerActive, setIsWhiteTimerActive] = useState(false);
     const [isBlackTimerActive, setIsBlackTimerActive] = useState(false);
 
@@ -28,32 +29,32 @@ export default function useChessTimers(initialWhiteTime, initialBlackTime) {
         return () => clearInterval(intervalId);
     }, [isBlackTimerActive]);
 
-    const startTimer = useCallback((color) => {
-        if (color === 'w') {
+    const startTimer = useCallback((colour) => {
+        if (colour === 'w') {
             setIsWhiteTimerActive(true);
             setIsBlackTimerActive(false);
-        } else if (color === 'b') {
+        } else if (colour === 'b') {
             setIsWhiteTimerActive(false);
             setIsBlackTimerActive(true);
         }
     }, []);
 
-    const stopTimer = useCallback(() => {
-        setIsWhiteTimerActive(false);
-        setIsBlackTimerActive(false);
+    const stopTimer = useCallback((colour) => {
+        if (colour === 'w') {
+            setIsWhiteTimerActive(false);
+            setWhiteTime((time) => time + increment)
+        } else if (colour === 'b') {
+            setIsBlackTimerActive(false);
+            setBlackTime((time) => time + increment)
+        }
     }, []);
 
-    const resetTimers = useCallback(() => {
-        setWhiteTime(initialWhiteTime);
-        setBlackTime(initialBlackTime);
-    }, [initialWhiteTime, initialBlackTime]);
-
-    // Added function to initialize timers
-    const initTimers = useCallback((newWhiteTime, newBlackTime) => {
-        setWhiteTime(newWhiteTime);
-        setBlackTime(newBlackTime);
+    const initTimers = useCallback((timeControl, increment) => {
+        setWhiteTime(timeControl);
+        setBlackTime(timeControl);
+        setIncrement(increment)
     }, []);
 
     // Return the added function alongside the existing ones
-    return { whiteTime, blackTime, startTimer, stopTimer, resetTimers, initTimers };
+    return { whiteTime, blackTime, startTimer, stopTimer, initTimers };
 }

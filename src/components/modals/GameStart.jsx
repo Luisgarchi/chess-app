@@ -3,7 +3,7 @@ import GameConfiguration from "./GameConfiguration";
 
 import { useState } from "react";
 
-export default function GameStart({configGame, defaultGame, initNames}) {
+export default function GameStart({ configGame, initParams, close }) {
 
     const [isGameConfigured, setIsGameConfigured] = useState(false);
 
@@ -14,13 +14,14 @@ export default function GameStart({configGame, defaultGame, initNames}) {
     return (
         <>
             {!isGameConfigured && <WelcomeMessage 
-                    onDefault={defaultGame}
+                    quickPlay = {close}
                     onSelectConfig = {selectConfigure}
                 />
             }
             {isGameConfigured && <GameConfiguration 
                     configGame={configGame}
-                    initNames={initNames}
+                    initParams={initParams}
+                    submit = {close}
                 />
             }
         </>
