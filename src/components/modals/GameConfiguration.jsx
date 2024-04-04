@@ -13,10 +13,8 @@ export default function GameConfiguration({ configGame, initParams, submit }) {
     const whiteNameRef = useRef()
     const blackNameRef = useRef()
 
-    console.log(whiteName)
-    console.log(blackName)
-
-    const buttonBaseStyle = "bg-stone-400 text-stone-900 px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4";
+    const buttonBaseStyle = "bg-stone-400 text-stone-900 px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4 font-medium";
+    const buttonBlue = "bg-blue-400 text-white px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4 outline-blue-600 hover:outline-blue-900 font-medium";
 
     function getButtonClass(condition) {
         // When the condition is true, make the outline thicker to indicate active state
@@ -70,7 +68,7 @@ export default function GameConfiguration({ configGame, initParams, submit }) {
     }
     
     return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-8 rounded-lg relative">
                 
                 {/* Alert for bad use of increment with time controls*/}
@@ -110,7 +108,7 @@ export default function GameConfiguration({ configGame, initParams, submit }) {
 
                 {/* Submit button*/}
                 <div className="flex justify-center mt-16">
-                    <button className={buttonBaseStyle + " button-pulsate"} onClick={handleClose}>Start Game</button>
+                    <button className={buttonBlue + " button-pulsate"} onClick={handleClose}>Start Game</button>
                 </div>
 
             </div>

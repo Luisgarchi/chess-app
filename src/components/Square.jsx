@@ -6,7 +6,7 @@ import { GameContext } from "../GameContext"
 export default function Square({ piece, maskValue, selectedPiecePosition, setNewPiece, position, turn }) {
 
     // Context hooks
-    const { active, makeMove } = useContext(GameContext);
+    const { makeMove } = useContext(GameContext);
 
     // Determine if the moving to the square is valid based on the mask value
     const validMove = maskValue === 'vacant' || maskValue === 'occupied';
@@ -47,9 +47,8 @@ export default function Square({ piece, maskValue, selectedPiecePosition, setNew
     }
 
     return (
-        <button 
-            className = {stylesSquareButton} 
-            disabled={!active} 
+        <button
+            className = {stylesSquareButton}
             onClick = {() => handleClick(position, selectedPiecePosition)}
         >
             {piece && <DisplayPiece piece={piece} />}

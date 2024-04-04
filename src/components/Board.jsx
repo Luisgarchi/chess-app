@@ -2,7 +2,6 @@ import { useState, useContext } from "react"
 import { GameContext } from "../GameContext"
 
 import Square from "./Square"
-import ChessBoard from "../chess/ChessBoard"
 
 // Generates a mask to highlight relevant squares based on the selected piece and board state
 function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition) {
@@ -33,14 +32,13 @@ function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition) {
 
 export default function Board() {
     const [selectedPiecePosition, setSelectedPiecePosition] = useState(null);
-    const { fen } = useContext(GameContext);
+    const { chessInstance } = useContext(GameContext);
 
-    const chessBoard = new ChessBoard(fen);
-    const mask = deriveMaskSquareHighlights(chessBoard, selectedPiecePosition);
+    const mask = deriveMaskSquareHighlights(chessInstance, selectedPiecePosition);
 
     return (
         <ol className="flex flex-col justify-center items-center">
-            {chessBoard.board.map((row, rowIndex) => (
+            {chessInstance.board.map((row, rowIndex) => (
                 <li className="flex" key={rowIndex}>
                     <ol className="flex justify-center">
                         {row.map((piece, colIndex) => {
@@ -58,7 +56,7 @@ export default function Board() {
                                         selectedPiecePosition={selectedPiecePosition}
                                         setNewPiece={setSelectedPiecePosition}
                                         position={position}
-                                        turn={chessBoard.activeColour}
+                                        turn={chessInstance.activeColour}
                                     />
                                 </li>
                             );
