@@ -6,7 +6,6 @@ export default function useChessTimers(stateTime, stateIncrement) {
     const [increment, setIncrement] = useState(stateIncrement)
 
     // Logic to handle no incrementing on first move
-    const [incrementWhite, setIncrementWhite] = useState(false);
     const [incrementBlack, setIncrementBlack] = useState(false);
 
     const [isWhiteTimerActive, setIsWhiteTimerActive] = useState(false);
@@ -47,12 +46,7 @@ export default function useChessTimers(stateTime, stateIncrement) {
     const stopTimer = useCallback((colour) => {
         if (colour === 'w') {
             setIsWhiteTimerActive(false);
-
-            if(incrementWhite) {
-                setWhiteTime((time) => time + increment)
-            } else {
-                setIncrementWhite(true)
-            }
+            setWhiteTime((time) => time + increment)
 
         } else if (colour === 'b') {
             setIsBlackTimerActive(false);
@@ -64,7 +58,7 @@ export default function useChessTimers(stateTime, stateIncrement) {
             }
             console.log(whiteTime, blackTime)
         }
-    }, [increment, incrementWhite, incrementBlack]);
+    }, [increment, incrementBlack]);
 
     const stopBothTimers = () => {
         setIsWhiteTimerActive(false);
@@ -75,7 +69,6 @@ export default function useChessTimers(stateTime, stateIncrement) {
         setWhiteTime(timeControl);
         setBlackTime(timeControl);
         setIncrement(increment)
-        setIncrementWhite(false)
         setIncrementBlack(false)
     }
 

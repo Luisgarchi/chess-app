@@ -2,7 +2,7 @@ import { useState, useRef, useContext } from "react"
 import { ModalContext } from "../../context/ModalContext"
 import kingBlack from "../../assets/kingBlack.svg"
 import kingWhite from "../../assets/kingWhite.svg"
-
+import Button from "../uiComponents/Button"
 
 export default function GameConfiguration() {
 
@@ -23,9 +23,11 @@ export default function GameConfiguration() {
     const blackNameRef = useRef()
 
     // Button styles
-    const buttonBaseStyle = "bg-stone-400 text-stone-900 px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4 font-medium";
-    const buttonBlue = "bg-blue-400 text-white px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4 outline-blue-600 hover:outline-blue-900 font-medium";
 
+    const buttonBaseStyle = "bg-stone-400 text-stone-900 px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4 font-medium flex items-center";
+    const buttonBlue = "bg-blue-400 text-white px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4 outline-blue-600 hover:outline-blue-900 font-medium flex items-center";
+    
+    
     function getButtonClass(condition) {
         // When the condition is true, make the outline thicker to indicate active state
         // For non-active buttons, add a hover effect that increases the outline width
@@ -87,7 +89,6 @@ export default function GameConfiguration() {
         setGameStatus("game-start")
     }
 
-    
     return (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-8 rounded-lg relative">
@@ -129,7 +130,7 @@ export default function GameConfiguration() {
 
                 {/* Submit button*/}
                 <div className="flex justify-center mt-16">
-                    <button className={buttonBlue + " button-pulsate"} onClick={handleClose}>Start Game</button>
+                    <Button type = {'play'} text = {"Start Game"} onClick={handleClose} styles = {buttonBlue}/>
                 </div>
 
             </div>

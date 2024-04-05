@@ -59,9 +59,9 @@ export default function App(){
         if (payload.type === "CHECKMATE"){
             setGameResult(`Checkmate - ${payload.turn === 'w' ? players.black : players.white} wins`);
         } else if (payload.type === "STALEMATE"){
-            setGameResult("Stalemate - Draw")
+            setGameResult("Draw - Stalemate")
         } else if (payload.type === "FIFTYMOVE"){
-            setGameResult("Fifty-move rule - Draw")
+            setGameResult("Draw - Fifty-move rule")
         } else if (payload.type === "TIME"){
             setGameResult(`${payload.turn === 'w' ? players.black : players.white} wins on time`)
         }
