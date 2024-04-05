@@ -11,7 +11,7 @@ import { PIECES } from "./pieces"
 // 6) isCheckMate() - returns true if the current king is in checkmate
 
 
-export default class ChessBoard {
+export default class Chess {
 
     constructor(fen){
 
@@ -23,8 +23,8 @@ export default class ChessBoard {
         this.activeColour = fenComponents[1]
         this.castlingAvailability = fenComponents[2]
         this.enpassantTarget = fenComponents[3]
-        this.halfmoveClock = fenComponents[4]
-        this.fullmoveNumber = fenComponents[5]
+        this.halfmoveClock = Number(fenComponents[4])
+        this.fullmoveNumber = Number(fenComponents[5])
         
         this.board = this.parseBoard()
     }
@@ -61,21 +61,44 @@ export default class ChessBoard {
         const file = algebraicNotation[0]
         const rank = parseInt(algebraicNotation[1])
 
-        const rowIndex = ChessBoard.rankToRowIndex(rank)
-        const colIndex = ChessBoard.fileToColIndex(file)
+        const rowIndex = Chess.rankToRowIndex(rank)
+        const colIndex = Chess.fileToColIndex(file)
 
         return {rowIndex, colIndex}
     }
 
     static toAlgebraicNotation(position) {
-        const file = ChessBoard.colIndexToFile(position.colIndex)
-        const rank = ChessBoard.rowIndexToRank(position.rowIndex)
+        const file = Chess.colIndexToFile(position.colIndex)
+        const rank = Chess.rowIndexToRank(position.rowIndex)
 
         return file + rank
     }
 
+    /* Static Method for three fold repetition */
+    static isThreeFoldRepetition(fenRepresentation){
 
+        const boardPositions = new Map(); // Stores board positions and their counts
 
+        for (let fen of fenRepresentation) {
+            const boardPosition = fen.split(' ')[0]; // Extract the board position from FEN
+
+            const count = boardPositions.get(boardPosition) || 0;
+            if (count === 2) { // A count of 2 means this occurrence is the third
+                return true;
+            }
+
+            boardPositions.set(boardPosition, count + 1); // Update count
+        }
+
+        return false; // No threefold repetition found
+    }
+
+    /* Method for fifty move rule */
+    isFiftyMove(){
+        return Number(this.halfmoveClock) >= 50
+    }
+
+    
     /* Board Representation */
 
     parseBoard() {
@@ -327,7 +350,7 @@ export default class ChessBoard {
         if (this.enpassantTarget !== '-' && 'Pp'.includes(piece)) {
     
             // Assuming this.enpassantTarget is in algebraic notation (e.g., "e3")
-            const targetPosition = ChessBoard.parseAlgebraicNotation(this.enpassantTarget)
+            const targetPosition = Chess.parseAlgebraicNotation(this.enpassantTarget)
 
             // Adjust the target position based on pawn color
             const newPieceRow   = position.rowIndex + ((piece === 'P') ? -1 : 1)
@@ -389,7 +412,7 @@ export default class ChessBoard {
         //  2) a piece (king or pinned piece) can not move into check
 
         // Create a copy of the board
-        const boardCopy = new ChessBoard(this.fen)
+        const boardCopy = new Chess(this.fen)
 
         // Make the move
         boardCopy.board[end.rowIndex][end.colIndex] = boardCopy.board[start.rowIndex][start.colIndex]
@@ -538,6 +561,43 @@ export default class ChessBoard {
         return positionsAlongVector
     }
 
+    /* StaleMate */
+
+    isStaleMate(){
+    
+        // Stalemate: king not in check and all other piece have no legal moves have no legal moves
+
+        const isKingCheck = this.isCheck()
+        if (isKingCheck){
+            return false
+        }
+
+        // Get all the pieces of the current player
+        const playerPieces = (this.activeColour === 'w') ? 'KQRBNP' : 'kqrbnp'
+        
+        for(let i = 0; i < this.board.length; i++){
+            for (let j = 0; j < this.board[i].length; j++){
+                
+                // Get the piece at the current position
+                const piece = this.board[i][j]
+
+                // Check if said piece is a player piece
+                if (playerPieces.includes(piece)){
+
+                    // Get the squares the piece can move to
+                    const piecePosition = {rowIndex: i, colIndex: j}
+                    const {regular, enpassant, castles} = this.getAllMoves(piecePosition)
+
+                    // If there is at least one legal move, it is not stalemate
+                    if (regular.length > 0 || enpassant.length > 0 || castles.length > 0){
+                        return false
+                    }
+                }
+            }
+        }
+        // If all pieces have no legal moves, it is stalemate
+        return true
+    }
 
 
     /* Executing verified moves */
@@ -665,9 +725,9 @@ export default class ChessBoard {
 
         // Update the enpassant target
         if ('Pp'.includes(initialPiece) && Math.abs(startPosition.rowIndex - endPosition.rowIndex) === 2){
-            const file = ChessBoard.colIndexToFile(endPosition.colIndex) 
-            const rank = ChessBoard.rowIndexToRank(endPosition.rowIndex)
-            const rankBehind = ChessBoard.incrementRank(rank, (initialPiece === 'P') ? -1 : 1) 
+            const file = Chess.colIndexToFile(endPosition.colIndex) 
+            const rank = Chess.rowIndexToRank(endPosition.rowIndex)
+            const rankBehind = Chess.incrementRank(rank, (initialPiece === 'P') ? -1 : 1) 
             this.enpassantTarget = file + rankBehind
         }
         else {

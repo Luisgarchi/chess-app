@@ -1,27 +1,31 @@
 import { useEffect, useMemo, createContext, memo } from 'react'
-import ChessBoard from '../chess/ChessBoard'
+import Chess from '../chess/Chess'
 
 import Board from './Board';
-import { GameContext } from '../GameContext';
+import { GameContext } from '../context/GameContext';
 
 function GameBoard ({ gameState, onMove, onGameOver }){
         
     // Derive a chess instance from the game state (in FEN notation)
-    const chessInstance = useMemo(() => new ChessBoard(gameState), [gameState]);
+    const chessInstance = new Chess(gameState)
 
     // Get the relevant game information
-    const turn = useMemo(() => chessInstance.activeColour, [chessInstance]);
-    const isCheckMate = useMemo(() => chessInstance.isCheckMate(), [chessInstance]);
-    //const isStaleMate = useMemo(() => chessInstance.isStaleMate(), [chessInstance]);
-    //const isFiftyMove = useMemo(() => chessInstance.isFiftyMove(), [chessInstance]);
+    const turn = chessInstance.activeColour
+    const isCheckMate = chessInstance.isCheckMate()
+    const isFiftyMove = chessInstance.isFiftyMove() 
+    const isStaleMate = chessInstance.isStaleMate()
     
 
     // Check if the game is over
     useEffect(() => {
         if (isCheckMate) {
             onGameOver({ type: "CHECKMATE", turn });
+        } else if (isFiftyMove){
+            onGameOver({ type: "FIFTYMOVE" });
+        } else if (isStaleMate){
+            onGameOver({ type: "STALEMATE" });
         }
-    }, [turn, isCheckMate])
+    }, [turn, isCheckMate, isFiftyMove, isStaleMate])
 
     function makeMove(start, end){
         // Execute the move on the board and retrieve the updated FEN notation.
@@ -29,8 +33,8 @@ function GameBoard ({ gameState, onMove, onGameOver }){
         const newFen = chessInstance.fen;
     
         // Construct the move in algebraic notation.
-        const moveStart = ChessBoard.toAlgebraicNotation(start);
-        const moveEnd = ChessBoard.toAlgebraicNotation(end);
+        const moveStart = Chess.toAlgebraicNotation(start);
+        const moveEnd = Chess.toAlgebraicNotation(end);
         const algebraicMove = `${moveStart}${moveEnd}`;
 
         onMove(newFen, algebraicMove, turn);

@@ -1,5 +1,20 @@
-export default function WelcomeMessage({quickPlay, onSelectConfig}) {
+import { useContext } from "react";
+import { ModalContext } from "../../context/ModalContext";
+
+export default function WelcomeMessage() {
     
+    const { setStates } = useContext(ModalContext)
+    const { setGameStatus } = setStates; 
+
+    function quickPlay(){
+        setGameStatus("game-start")
+    }
+
+    function onSelectConfig(){
+        setGameStatus("settings")
+    }
+
+
     const buttonBaseStyle = "bg-stone-400 text-stone-900 px-4 py-2 mx-4 rounded outline outline-2 hover:outline-4 flex-1 font-medium";
 
     return (

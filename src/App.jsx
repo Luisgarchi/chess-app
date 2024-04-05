@@ -3,11 +3,11 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import GameMode from "./components/GameMode";
 import Player from "./components/Player";
 import useChessTimers from "./useChessTimers";
-import GameStart from "./components/modals/GameStart";
-import GameOver from "./components/modals/GameOver"
 import GameBoard from "./components/GameBoard";
-
-const startNotation = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+import Chess from "./chess/Chess";
+import Modal from "./components/modals/Modal";
+import { ModalContext } from "./context/ModalContext";
+import { fenStart } from "./chess/fenStart";
 
 const INITIAL_PLAYERS = {
     white: "White",
@@ -18,9 +18,9 @@ const INITIAL_PLAYERS = {
 export default function App(){
 
     // Define App States
-    const [chessLogs, setChessLogs] = useState([{ move: null, fen: startNotation }])
+    const [chessLogs, setChessLogs] = useState([{ move: null, fen: fenStart }])
     const [gameDisplay, setGameDisplay] = useState(chessLogs[chessLogs.length - 1].fen)
-    const [gameStatus, setGameStatus] = useState("not-started");
+    const [gameStatus, setGameStatus] = useState("app-start");
     const [gameResult, setGameResult] = useState(undefined)
 
     // Define Custom Chess Game Settings
@@ -34,14 +34,6 @@ export default function App(){
     // Derive the current game state from the chess logs
     const gameState = useMemo(() => chessLogs[chessLogs.length - 1].fen, [chessLogs])
 
-
-
-
-
-
-    // const isDraw = chessBoard.isDraw()
-    // const isStaleMate = chessBoard.isStaleMate()
-
     // Check if the game is over
     useEffect(() => {
         if (whiteTime === 0 || blackTime === 0) {
@@ -52,9 +44,15 @@ export default function App(){
         }
     }, [whiteTime, blackTime])
 
+    // Check for three fold repetition
+    useEffect(() => {
+        const isThreeFoldRepetition = Chess.isThreeFoldRepetition(chessLogs.map(log => log.fen))
+        if (isThreeFoldRepetition) {
+            setGameStatus("game-over");
+            setGameResult("Threefold repetition - Draw")
+        }
+    }, [chessLogs])
     
-
-
     function handleGameOver(payload){
         setGameStatus("game-over")
 
@@ -70,37 +68,40 @@ export default function App(){
         stopBothTimers()
     }
 
-    function handleMove(fen, move, turn){
-        setGameStatus("in-progress")
+    const handleMove = useCallback((fen, move, turn) => {
+        setGameStatus("in-progress");
         setChessLogs(prevLogs => [...prevLogs, { move, fen }]);
+        
+        if (timeControls !== undefined) {
+            stopTimer(turn);
+            const nextTurn = turn === 'w' ? 'b' : 'w';
+            startTimer(nextTurn);
+        }
+    }, [timeControls, startTimer, stopTimer]);
 
-        stopTimer(turn);
-        const nextTurn = turn === 'w' ? 'b' : 'w';
-        startTimer(nextTurn);
-    }
 
-    function handlePlayerNameChange(colour, newName){
-        setPlayers(prevPlayers => ({...prevPlayers, [colour]: newName}));  
-    }
-
-    function configureGame(time, increment, whiteName, blackName){
-        setTimeControls(time)
-        setIncrement(increment)
-        setPlayers({white: whiteName, black: blackName})
+    function playAgain(){
+        setGameStatus("in-progress")
+        setChessLogs([{ move: null, fen: startNotation }])
+        setGameResult(undefined)
+        initTimers(timeControls, increment)
     }
 
     useEffect(()=> {
         initTimers(timeControls, increment)
     }, [timeControls, increment])
 
-    const initParams = { timeControls, increment, players }
+
+    // Modal Context
+    const modalStates = { gameStatus, gameResult, players, timeControls, increment }
+    const modalSetStates = { setChessLogs, setGameStatus, setGameResult, setPlayers, setTimeControls, setIncrement, initTimers }
+    const modalCtxValues = { states: modalStates, setStates: modalSetStates }
 
     return (
         <>
-            {(gameStatus === "not-started") && 
-                <GameStart configGame={configureGame} initParams = {initParams} close = {() => setGameStatus("in-progress")} />}
-            {(gameStatus === "game-over") && 
-                <GameOver status = {gameResult}/>}
+            <ModalContext.Provider value = {modalCtxValues}>
+                <Modal />
+            </ModalContext.Provider>
 
             <div className="bg-stone-200 w-screen h-screen flex justify-center items-center">
                 <div className="flex gap-4">
@@ -108,9 +109,9 @@ export default function App(){
                         <GameMode onChangeTime={() => {return}} gameStatus={gameStatus}/>
                     </div>
                     <div className="flex flex-col items-center justify-center gap-4">
-                        <Player initialName={players.black} colour="black" onChangeName={handlePlayerNameChange} time = {blackTime}/>
+                        <Player initialName={players.black} colour="black" onChangeName={() => {return}} time = {blackTime}/>
                         <GameBoard gameState = {gameState} onMove = {handleMove} onGameOver = {handleGameOver} />
-                        <Player initialName={players.white} colour="white" onChangeName={handlePlayerNameChange} time = {whiteTime}/>
+                        <Player initialName={players.white} colour="white" onChangeName={() => {return}} time = {whiteTime}/>
                     </div>
                 </div>
             </div>

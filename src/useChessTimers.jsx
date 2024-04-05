@@ -34,7 +34,7 @@ export default function useChessTimers(stateTime, stateIncrement) {
         return () => clearInterval(intervalId);
     }, [isBlackTimerActive]);
 
-    const startTimer = useCallback((colour) => {
+    const startTimer = (colour) => {
         if (colour === 'w') {
             setIsWhiteTimerActive(true);
             setIsBlackTimerActive(false);
@@ -42,7 +42,7 @@ export default function useChessTimers(stateTime, stateIncrement) {
             setIsWhiteTimerActive(false);
             setIsBlackTimerActive(true);
         }
-    }, []);
+    };
 
     const stopTimer = useCallback((colour) => {
         if (colour === 'w') {
@@ -62,21 +62,22 @@ export default function useChessTimers(stateTime, stateIncrement) {
             } else {
                 setIncrementBlack(true)
             }
+            console.log(whiteTime, blackTime)
         }
     }, [increment, incrementWhite, incrementBlack]);
 
-    const stopBothTimers = useCallback(() => {
+    const stopBothTimers = () => {
         setIsWhiteTimerActive(false);
         setIsBlackTimerActive(false);
-    }, []);
+    }
 
-    const initTimers = useCallback((timeControl, increment) => {
+    const initTimers = (timeControl, increment) => {
         setWhiteTime(timeControl);
         setBlackTime(timeControl);
         setIncrement(increment)
         setIncrementWhite(false)
         setIncrementBlack(false)
-    }, []);
+    }
 
     // Return the added function alongside the existing ones
     return { whiteTime, blackTime, startTimer, stopTimer, stopBothTimers, initTimers };

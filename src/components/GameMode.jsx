@@ -1,4 +1,3 @@
-import Modal from "./Modal";
 import RestartConfirmation from "./modals/RestartConfirmation";
 
 import { useState } from "react";
@@ -42,13 +41,6 @@ export default function GameMode({ onChangeTime, gameStatus }) {
 
     return (
         <>
-            <Modal open={modalIsOpen} onClose={closeModal}>
-                {modalIsOpen && <RestartConfirmation 
-                    onRestart={() => handleRestart(time)} 
-                    onCancel={closeModal} 
-                />}
-            </Modal>
-
             <header className="flex flex-col justify-between h-full">
                 <button className={buttonBaseStyles} onClick={() => handleClick(120)}>
                     Bullet <span className={wrapTextStyles}>(2 min)</span>
