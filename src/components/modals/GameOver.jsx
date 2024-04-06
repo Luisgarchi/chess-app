@@ -1,11 +1,11 @@
 import { useContext } from "react";
-import { ModalContext } from "../../context/ModalContext";
+import { AppContext } from "../../context/AppContext";
 import { fenStart } from "../../chess/fenStart";
 
 import Button from "../uiComponents/Button";
 
 export default function GameOver() {
-    const { states, setStates } = useContext(ModalContext);
+    const { states, setStates } = useContext(AppContext);
     const { gameResult, timeControls, increment } = states;
     const { setChessLogs, setGameStatus, setGameResult, initTimers } = setStates;
 

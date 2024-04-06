@@ -1,11 +1,11 @@
 import { useContext } from "react";
-import { ModalContext } from "../../context/ModalContext";
+import { AppContext } from "../../context/AppContext";
 import Button from "../uiComponents/Button";
 
 
 export default function WelcomeMessage() {
     
-    const { setStates } = useContext(ModalContext);
+    const { setStates } = useContext(AppContext);
     const { setGameStatus } = setStates;
 
     function quickPlay() {

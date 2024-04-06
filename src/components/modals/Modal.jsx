@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { createPortal } from "react-dom";
-import { ModalContext } from "../../context/ModalContext";
+import { AppContext } from "../../context/AppContext";
 import WelcomeMessage from "./WelcomeMessage";
 import GameConfiguration from "./GameConfiguration";
 import RestartConfirmation from "./RestartConfirmation";
@@ -8,7 +8,7 @@ import GameOver from "./GameOver";
  
 function Modal() {
 
-    const { states } = useContext(ModalContext)
+    const { states } = useContext(AppContext)
     const { gameStatus } = states
 
     let modalContent = <></>

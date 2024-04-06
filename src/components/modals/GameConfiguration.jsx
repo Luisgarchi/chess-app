@@ -1,13 +1,13 @@
 import { useState, useRef, useContext } from "react"
-import { ModalContext } from "../../context/ModalContext"
+import { AppContext } from "../../context/AppContext"
 import kingBlack from "../../assets/kingBlack.svg"
 import kingWhite from "../../assets/kingWhite.svg"
 import Button from "../uiComponents/Button"
 
 export default function GameConfiguration() {
 
-    // Get the states and setStates from the ModalContext
-    const { states, setStates } = useContext(ModalContext)
+    // Get the states and setStates from the AppContext
+    const { states, setStates } = useContext(AppContext)
     const { players, timeControls, increment } = states
     const { setPlayers, setTimeControls, setIncrement, setGameStatus } = setStates
 

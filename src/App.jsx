@@ -6,7 +6,7 @@ import useChessTimers from "./useChessTimers";
 import GameBoard from "./components/GameBoard";
 import Chess from "./chess/Chess";
 import Modal from "./components/modals/Modal";
-import { ModalContext } from "./context/ModalContext";
+import { AppContext } from "./context/AppContext";
 import { fenStart } from "./chess/fenStart";
 
 const INITIAL_PLAYERS = {
@@ -92,17 +92,15 @@ export default function App(){
 
 
     // Modal Context
-    const modalStates = { gameStatus, gameResult, players, timeControls, increment }
+    const modalStates = { chessLogs, gameStatus, gameResult, players, timeControls, increment }
     const modalSetStates = { setChessLogs, setGameStatus, setGameResult, setPlayers, setTimeControls, setIncrement, initTimers }
     const modalCtxValues = { states: modalStates, setStates: modalSetStates }
 
 
 
     return (
-        <>
-            <ModalContext.Provider value = {modalCtxValues}>
-                <Modal />
-            </ModalContext.Provider>
+        <AppContext.Provider value = {modalCtxValues}>
+            <Modal />
 
             <div className="bg-stone-200 w-screen h-screen flex justify-center items-center">
                 <div className="flex gap-4">
@@ -112,11 +110,11 @@ export default function App(){
                         <Player initialName={players.white} colour="w" onChangeName={() => {return}} time = {whiteTime} resign = {resignGame}/>
                     </div>
                     <div className="flex flex-col items-center justify-center">
-                        <GameMode onChangeTime={() => {return}} gameStatus={gameStatus}/>
+                        <GameMode chessLogs = {chessLogs}/>
                     </div>
                 </div>
             </div>
-        </>
+        </AppContext.Provider>
     )
 }
 
