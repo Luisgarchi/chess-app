@@ -79,13 +79,12 @@ export default function App(){
         }
     }, [timeControls, startTimer, stopTimer]);
 
-
-    function playAgain(){
-        setGameStatus("in-progress")
-        setChessLogs([{ move: null, fen: startNotation }])
-        setGameResult(undefined)
-        initTimers(timeControls, increment)
+    function resignGame(colour){
+        setGameStatus("game-over");
+        setGameResult(`${colour === 'w' ? players.black : players.white} wins by resignation`);
+        stopBothTimers()
     }
+
 
     useEffect(()=> {
         initTimers(timeControls, increment)
@@ -97,6 +96,8 @@ export default function App(){
     const modalSetStates = { setChessLogs, setGameStatus, setGameResult, setPlayers, setTimeControls, setIncrement, initTimers }
     const modalCtxValues = { states: modalStates, setStates: modalSetStates }
 
+
+
     return (
         <>
             <ModalContext.Provider value = {modalCtxValues}>
@@ -105,13 +106,13 @@ export default function App(){
 
             <div className="bg-stone-200 w-screen h-screen flex justify-center items-center">
                 <div className="flex gap-4">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                        <Player initialName={players.black} colour="b" onChangeName={() => {return}} time = {blackTime} resign = {resignGame}/>
+                        <GameBoard gameState = {gameState} onMove = {handleMove} onGameOver = {handleGameOver} />
+                        <Player initialName={players.white} colour="w" onChangeName={() => {return}} time = {whiteTime} resign = {resignGame}/>
+                    </div>
                     <div className="flex flex-col items-center justify-center">
                         <GameMode onChangeTime={() => {return}} gameStatus={gameStatus}/>
-                    </div>
-                    <div className="flex flex-col items-center justify-center gap-4">
-                        <Player initialName={players.black} colour="black" onChangeName={() => {return}} time = {blackTime}/>
-                        <GameBoard gameState = {gameState} onMove = {handleMove} onGameOver = {handleGameOver} />
-                        <Player initialName={players.white} colour="white" onChangeName={() => {return}} time = {whiteTime}/>
                     </div>
                 </div>
             </div>
