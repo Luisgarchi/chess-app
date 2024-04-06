@@ -5,6 +5,8 @@ import timer from "../assets/timer.svg"
 import arrowup from "../assets/arrowup.svg"
 
 import Button from "./uiComponents/Button"
+import MoveHistory from "./MoveHistory."
+
 
 export default function GameMode() {
 
@@ -30,41 +32,11 @@ export default function GameMode() {
             // Extarct opening name (if present)
             if(responseData.opening !== null){
                 setOpening(responseData.opening.name)
-            } else {
-                setOpening(null)
             }
         }
 
         fetchOpening()
     }, [currentFen, openingRequest])
-
-
-    // Styles for the buttons
-    const buttonBaseStyles = `font-bold text-stone-950 flex-grow px-4 border-4 rounded
-        bg-stone-400 border-solid border-stone-400 hover:border-stone-600`;
-
-    const buttonMiddleStyles = `${buttonBaseStyles} my-4`;
-
-    // Additional CSS class to ensure text in brackets wraps
-    const wrapTextStyles = `block`;
-
-
-
-    function handleClick(time) {
-
-        if (gameStatus === "in-progress") {
-            setModalIsOpen(true);
-            setTime(time);
-        }
-        else{
-            onChangeTime(time);
-        }
-    }
-
-    function handleRestart(time){
-        onChangeTime(time);
-        setModalIsOpen(false); // Close the modal
-    }
 
 
     let displayTime
@@ -73,40 +45,30 @@ export default function GameMode() {
         displayTime = 'Off';
     } else {
         const mins = Math.floor(timeControls / 60)
-        displayTime = `${mins.toString()} min${mins > 1 ? 's' : ''}`;
+        displayTime = `${mins.toString()}m`;
     }
 
-    
     return (
-        <header className="bg-stone-400 p-4 flex flex-col justify-between outline outline-2 rounded">
-            
-            
-            <div className="flex justify-between items-center">
-                <div >
-                    <img src={timer} alt="timer" className="h-8 w-8 inline-block mr-2" />
+        <header className="bg-stone-400 p-4 flex flex-col justify-between outline outline-2 rounded-lg w-80 mx-auto">
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex-1">
+                    <img src={timer} alt="timer" className="h-9 w-9 inline-block" />
                     <span className="text-stone-900 font-bold">  { displayTime }</span>
                 </div>
-                <div>
-                    <img src={arrowup} alt="increment" className="h-8 w-8 inline-block mr-2" />
+                <div className="flex-1">
+                    <img src={arrowup} alt="increment" className="h-9 w-9 inline-block" />
                     <span className="text-stone-900 font-bold"> {increment}s</span>   
                 </div>
-                <Button type = "restart" iconStyles={"h-8 w-8 mr-2"}/>
-                <Button type = "settings" iconStyles={"h-7 w-7 mr-2"}/>
+                <Button type = "restart" iconStyles={"h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
+                <Button type = "settings" iconStyles={"h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
             </div>
 
             {/*  <Navigation />  */}
             {/*  <History />  <h1>{opening.opening.name}</h1> */}
             
-            <h2 className="text-2xl font-bold text-black mb-2">Welcome to React Chess</h2>
-            <button className={buttonBaseStyles} >
-                Bullet <span className={wrapTextStyles}>(2 min)</span>
-            </button>
-            <button className={buttonMiddleStyles}>
-                Blitz <span className={wrapTextStyles}>(5 mins)</span>
-            </button>
-            <button className={buttonBaseStyles} >
-                Rapid <span className={wrapTextStyles}>(10 mins)</span>
-            </button>
+            {opening !== null && <h1 className="text-lg font-bold text-black mt-2 text-center">{opening}</h1>}
+            <MoveHistory/>
+
         </header>
     );
 }

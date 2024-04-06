@@ -3,7 +3,10 @@ import settings from "../../assets/settings.svg"
 import restart from "../../assets/restart.svg"
 import analyse from "../../assets/analyse.svg"
 import flag from "../../assets/flag.svg"
-
+import forward from "../../assets/forward.svg"
+import forwardforward from "../../assets/forwardforward.svg"
+import back from "../../assets/back.svg"
+import backback from "../../assets/backback.svg"
 
 const icon = {
     play: play,
@@ -11,6 +14,10 @@ const icon = {
     restart: restart,
     analyse: analyse,
     flag: flag,
+    forward: forward,
+    forwardforward: forwardforward,
+    back: back,
+    backback: backback,
 }
 
 export default function Button({type, text, onClick, styles, iconStyles}) {
