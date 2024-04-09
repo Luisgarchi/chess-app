@@ -80,9 +80,6 @@ export default function SideBar() {
                 <Button onClick = {handleClickRestart} type = "restart" iconStyles={"bg-stone-200 h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
                 <Button onClick = {handleClickSettings} type = "settings" iconStyles={"bg-stone-200 h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
             </div>
-
-            {/*  <Navigation />  */}
-            {/*  <History />  <h1>{opening.opening.name}</h1> */}
             
             {opening !== null && <h1 className="text-lg font-bold text-black mt-2 text-center">{opening}</h1>}
             <MoveHistory/>

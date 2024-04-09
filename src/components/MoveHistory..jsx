@@ -79,11 +79,14 @@ export default function MoveHistory() {
         }
     }
 
+
+    // Derive move history list
     const moves = moveHistory.map((moveData, numFullMove) => {
         
         // Get the row which contains the active move
         const activeRow = Math.floor((displayId - 1) / 2)
         
+        // Conditional styles if current active move
         const baseStyles = "w-5/12 text-right px-2 hover:bg-stone-700 hover:text-white"
         
         let whiteStyles = baseStyles
@@ -98,9 +101,11 @@ export default function MoveHistory() {
             }
         }
 
+        // Get move data
         const whiteMove = moveData.white
         const blackMove = ('black' in moveData) ? moveData.black : ''
         
+        // Check black has moved
         if (blackMove === ''){
             blackStyles = "w-5/12 text-right pr-2"
         }
@@ -114,6 +119,8 @@ export default function MoveHistory() {
         )
     })
 
+
+    
     const iconStyles = "h-8 w-8"
     
     return (

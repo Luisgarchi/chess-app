@@ -1,15 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 
+
+// Custom hook to handle chess timers
 export default function useChessTimers(stateTime, stateIncrement) {
+
+
+
     const [whiteTime, setWhiteTime] = useState(stateTime);
     const [blackTime, setBlackTime] = useState(stateTime);
     const [increment, setIncrement] = useState(stateIncrement)
 
-    // Logic to handle no incrementing on first move
+    // Logic to handle no incrementing on first move (only need to handle the black case
+    // since whites first move is done with the timers "off" )
     const [incrementBlack, setIncrementBlack] = useState(false);
 
+    // Timer states
     const [isWhiteTimerActive, setIsWhiteTimerActive] = useState(false);
     const [isBlackTimerActive, setIsBlackTimerActive] = useState(false);
+
 
     // White Timer
     useEffect(() => {
@@ -32,6 +40,8 @@ export default function useChessTimers(stateTime, stateIncrement) {
         }
         return () => clearInterval(intervalId);
     }, [isBlackTimerActive]);
+
+
 
     const startTimer = (colour) => {
         if (colour === 'w') {
@@ -60,11 +70,13 @@ export default function useChessTimers(stateTime, stateIncrement) {
         }
     }, [increment, incrementBlack]);
 
+
     const stopBothTimers = () => {
         setIsWhiteTimerActive(false);
         setIsBlackTimerActive(false);
     }
 
+    
     const initTimers = (timeControl, increment) => {
         setWhiteTime(timeControl);
         setBlackTime(timeControl);

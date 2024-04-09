@@ -1,8 +1,8 @@
 import { useContext } from 'react';
 import { GameContext } from "../../context/GameContext"
-
 import DisplayPiece from './DisplayPiece';
 import DisplayOverlay from './DisplayOverlay';
+
 
 export default function Square({ piece, maskValue, selectedPiecePosition, setNewPiece, position, turn }) {
 
@@ -47,6 +47,7 @@ export default function Square({ piece, maskValue, selectedPiecePosition, setNew
         }
     }
 
+    // Render the square button
     return (
         <button
             className = {stylesSquareButton}

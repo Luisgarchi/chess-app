@@ -1,10 +1,13 @@
 import { useState, useContext } from "react"
 import { GameContext } from "../../context/GameContext"
-
 import Square from "./Square"
 
-// Generates a mask to highlight relevant squares based on the selected piece and board state
+
+
 function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition) {
+
+    // Generates a mask to highlight relevant squares based on the selected piece and board state
+
     const mask = Array.from({ length: 8 }, () => Array(8).fill("none"));
 
     // Highlight the king's position if in check
@@ -30,12 +33,19 @@ function deriveMaskSquareHighlights(chessBoard, selectedPiecePosition) {
     return mask;
 }
 
+
+
 export default function Board() {
+
+    // Define state hooks
     const [selectedPiecePosition, setSelectedPiecePosition] = useState(null);
     const { chessInstance } = useContext(GameContext);
 
+    // Derive the mask to highlight squares
     const mask = deriveMaskSquareHighlights(chessInstance, selectedPiecePosition);
 
+
+    // Render the board 
     return (
         <ol className="flex flex-col justify-center items-center">
             {chessInstance.board.map((row, rowIndex) => (

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import kingWhite from '../assets/pieces/kingWhite.svg'
 import kingBlack from '../assets/pieces/kingBlack.svg'
 import Button from './uiComponents/Button'
@@ -9,6 +9,7 @@ export default function Player({ initialName, colour, time, resign }) {
     // Define state hooks
     const [name, setName] = useState(initialName)
 
+    // Update the name if the initial name changes
     useEffect(() => {
         setName(initialName);
     }, [initialName]);
@@ -24,11 +25,11 @@ export default function Player({ initialName, colour, time, resign }) {
     } else {
         displayTime = `${Math.floor(time / 60).toString().padStart(2, '0')}:${(time % 60).toString().padStart(2, '0')}`;
     }
-
-
     
+    // Define styles
     const buttonStyle = "mr-8 rounded font-medium";
     const playerStyle = `flex justify-between w-full items-center bg-stone-400 p-4 text-stone-950 outline outline-2 rounded-xl`
+
     return (
         <div className = {playerStyle}>
             <div className='flex items-center gap-2'>

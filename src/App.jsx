@@ -133,8 +133,10 @@ export default function App(){
                 <div className="flex gap-4">
                     <div className="flex flex-col items-center justify-center gap-4">
                         <Player initialName={players.black} colour="b" onChangeName={() => {return}} time = {blackTime} resign = {resignGame}/>
+                        
                         { displaGame && <GameBoard gameState = {gameState} onMove = {handleMove} onGameOver = {handleGameOver} />}
                         { !displaGame && <DisplayBoard gameState = {displayFen} />}
+
                         <Player initialName={players.white} colour="w" onChangeName={() => {return}} time = {whiteTime} resign = {resignGame}/>
                     </div>
                     <div className="flex flex-col items-center justify-center">

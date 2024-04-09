@@ -4,6 +4,7 @@ import Chess from '../../chess/Chess'
 import Board from './Board';
 import { GameContext } from '../../context/GameContext';
 
+
 function GameBoard ({ gameState, onMove, onGameOver }){
         
     // Derive a chess instance from the game state (in FEN notation)
@@ -27,7 +28,11 @@ function GameBoard ({ gameState, onMove, onGameOver }){
         }
     }, [turn, isCheckMate, isFiftyMove, isStaleMate])
 
+
     function makeMove(start, end){
+
+        // Function gets the necessary data to execute a move and then calls the onMove function
+
         // Execute the move on the board and retrieve the updated FEN notation.
         chessInstance.makeMove(start, end);
         const newFen = chessInstance.fen;
@@ -40,10 +45,13 @@ function GameBoard ({ gameState, onMove, onGameOver }){
         onMove(newFen, algebraicMove, turn);
     }
 
+    // Isolate context object to pass down to children (avoids board re-rendering when game state changes, mostly wrt timers)
+
     const ctxGame = useMemo(() => ({
         chessInstance,
         makeMove,
     }), [chessInstance, makeMove])
+
 
     return (        
         <GameContext.Provider value={ctxGame}>
