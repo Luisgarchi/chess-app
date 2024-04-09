@@ -44,8 +44,3 @@ The application and the gameplay can be intuitively managed through dialog modal
 - Welcome Message: The modal displays a WelcomeMessage component, greeting players and introducing them to the game.
 - Game Configuration: allows players to customize their game settings before beginning.
 - Game Over Notification: Upon the game reaching a "game-over" state it notifies players of the game's conclusion and the outcome.
-
-
-
-
-The **Player component** in the chess game displays the player's name, which can be edited dynamically, along with their color (white or black) and remaining game time. Utilizing useState for name and edit status, useRef for input focus, and useEffect for timely focus management, it offers an interactive experience for editing names. Additionally, the component shows the player's color through an icon and includes a timer display
