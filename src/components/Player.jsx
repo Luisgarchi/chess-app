@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import kingWhite from '../assets/kingWhite.svg'
-import kingBlack from '../assets/kingBlack.svg'
+import kingWhite from '../assets/pieces/kingWhite.svg'
+import kingBlack from '../assets/pieces/kingBlack.svg'
 import Button from './uiComponents/Button'
 
 

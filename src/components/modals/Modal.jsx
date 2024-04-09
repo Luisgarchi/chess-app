@@ -3,14 +3,12 @@ import { createPortal } from "react-dom";
 import { AppContext } from "../../context/AppContext";
 import WelcomeMessage from "./WelcomeMessage";
 import GameConfiguration from "./GameConfiguration";
-import RestartConfirmation from "./RestartConfirmation";
 import GameOver from "./GameOver";
- 
+
 function Modal() {
 
-    const { states, setStates } = useContext(AppContext)
+    const { states } = useContext(AppContext)
     const { gameStatus, modalStatus } = states
-    const {restartGame} = setStates
 
     let modalContent = <></>
 
@@ -22,9 +20,6 @@ function Modal() {
     }    
     else if(gameStatus === "game-over") {
         modalContent = <GameOver />
-    }
-    else if(modalStatus === "restart") {
-        modalContent = <RestartConfirmation />
     }
 
 

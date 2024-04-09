@@ -1,7 +1,7 @@
 import { useState, useRef, useContext } from "react"
 import { AppContext } from "../../context/AppContext"
-import kingBlack from "../../assets/kingBlack.svg"
-import kingWhite from "../../assets/kingWhite.svg"
+import kingBlack from "../../assets/pieces/kingBlack.svg"
+import kingWhite from "../../assets/pieces/kingWhite.svg"
 import Button from "../uiComponents/Button"
 
 export default function GameConfiguration() {

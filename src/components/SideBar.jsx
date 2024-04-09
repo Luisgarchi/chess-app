@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from "react"
 import { AppContext } from "../context/AppContext"
 
-import timer from "../assets/timer.svg"
-import arrowup from "../assets/arrowup.svg"
+import timer from "../assets/icons/timer.svg"
+import arrowup from "../assets/icons/arrowup.svg"
 
 import Button from "./uiComponents/Button"
 import MoveHistory from "./MoveHistory."

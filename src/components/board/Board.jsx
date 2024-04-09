@@ -1,5 +1,5 @@
 import { useState, useContext } from "react"
-import { GameContext } from "../context/GameContext"
+import { GameContext } from "../../context/GameContext"
 
 import Square from "./Square"
 

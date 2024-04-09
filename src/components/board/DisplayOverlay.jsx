@@ -1,5 +1,5 @@
-import highlightVacant from '../assets/highlightVacant.svg'
-import highlightEnemy from '../assets/highlightEnemy.svg'
+import highlightVacant from '../../assets/highlights/vacant.svg'
+import highlightEnemy from '../../assets/highlights/enemy.svg'
 
 
 export default function DisplayOverlay({ value }) {

@@ -1,7 +1,5 @@
 import { useContext } from "react";
 import { AppContext } from "../../context/AppContext";
-import { fenStart } from "../../chess/fenStart";
-
 import Button from "../uiComponents/Button";
 
 export default function GameOver() {

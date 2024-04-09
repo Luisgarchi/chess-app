@@ -1,4 +1,4 @@
-import Chess from "../chess/Chess"
+import Chess from "../../chess/Chess"
 import DisplayPiece from "./DisplayPiece";
 
 export default function DisplayBoard({ gameState }) {

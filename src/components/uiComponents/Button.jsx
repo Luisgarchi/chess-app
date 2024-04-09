@@ -1,13 +1,13 @@
-import play from "../../assets/play.svg";
-import settings from "../../assets/settings.svg"
-import restart from "../../assets/restart.svg"
-import analyse from "../../assets/analyse.svg"
-import flag from "../../assets/flag.svg"
-import forward from "../../assets/forward.svg"
-import forwardforward from "../../assets/forwardforward.svg"
-import back from "../../assets/back.svg"
-import backback from "../../assets/backback.svg"
-import cancel from "../../assets/cancel.svg"
+import play from "../../assets/icons/play.svg";
+import settings from "../../assets/icons/settings.svg"
+import restart from "../../assets/icons/restart.svg"
+import analyse from "../../assets/icons/analyse.svg"
+import flag from "../../assets/icons/flag.svg"
+import forward from "../../assets/icons/forward.svg"
+import forwardforward from "../../assets/icons/forwardforward.svg"
+import back from "../../assets/icons/back.svg"
+import backback from "../../assets/icons/backback.svg"
+import cancel from "../../assets/icons/cancel.svg"
 
 const icon = {
     play: play,

@@ -3,12 +3,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import SideBar from "./components/SideBar";
 import Player from "./components/Player";
 import useChessTimers from "./useChessTimers";
-import GameBoard from "./components/GameBoard";
+import GameBoard from "./components/board/GameBoard";
 import Chess from "./chess/Chess";
 import Modal from "./components/modals/Modal";
 import { AppContext } from "./context/AppContext";
 import { fenStart } from "./chess/fenStart";
-import DisplayBoard from "./components/DisplayBoard";
+import DisplayBoard from "./components/board/DisplayBoard";
 
 const INITIAL_PLAYERS = {
     white: "White",
@@ -17,6 +17,8 @@ const INITIAL_PLAYERS = {
 
 
 export default function App(){
+
+    /* _______   State   _______*/
 
     // Define App States
     const [chessLogs, setChessLogs] = useState([{ move: null, fen: fenStart }])
@@ -30,13 +32,17 @@ export default function App(){
     const [increment, setIncrement] = useState(0)
     const [timeControls, setTimeControls] = useState(undefined)
 
-    // Define Chess Timers
+    // Define Chess Timers (custom hook)
     const { whiteTime, blackTime, startTimer, stopTimer, stopBothTimers, initTimers } = useChessTimers(timeControls, increment);
 
     // Derive the current game state from the chess logs
     const gameState = useMemo(() => chessLogs[chessLogs.length - 1].fen, [chessLogs])
 
-    // Check if the game is over
+
+
+    /* _______   Effects   _______*/
+
+    // Check if the game is over by time
     useEffect(() => {
         if (whiteTime === 0 || blackTime === 0) {
             // Game ends due to time running out, so the player with time left wins
@@ -54,6 +60,19 @@ export default function App(){
             setGameResult("Threefold repetition - Draw")
         }
     }, [chessLogs])
+
+    // Initialise the timers when the time controls or increment is changes
+    useEffect(()=> {
+        initTimers(timeControls, increment)
+    }, [timeControls, increment])
+
+    // Set the displayId to the last immediately after a new move is made
+    useEffect(() => {
+        setDisplayId(chessLogs.length -1);
+    },[chessLogs])
+
+
+    /* _______   Functions   _______*/
     
     function handleGameOver(payload){
         setGameStatus("game-over")
@@ -79,11 +98,6 @@ export default function App(){
             startTimer(nextTurn);
         }
     }, [timeControls, startTimer, stopTimer]);
-
-    useEffect(() => {
-        setDisplayId(chessLogs.length -1);
-
-    },[chessLogs])
     
 
     function resignGame(colour){
@@ -101,12 +115,8 @@ export default function App(){
         initTimers(timeControls, increment)
     }
 
-    useEffect(()=> {
-        initTimers(timeControls, increment)
-    }, [timeControls, increment])
 
-
-    // Modal Context
+    // App State context
     const modalStates = { chessLogs, displayId, gameStatus, gameResult, modalStatus, players, timeControls, increment }
     const modalSetStates = { setChessLogs, setDisplayId, setGameStatus, setGameResult, setModalStatus, setPlayers, setTimeControls, setIncrement, initTimers, restartGame }
     const modalCtxValues = { states: modalStates, setStates: modalSetStates }

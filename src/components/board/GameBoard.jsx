@@ -1,8 +1,8 @@
-import { useEffect, useMemo, createContext, memo } from 'react'
-import Chess from '../chess/Chess'
+import { useEffect, useMemo, memo } from 'react'
+import Chess from '../../chess/Chess'
 
 import Board from './Board';
-import { GameContext } from '../context/GameContext';
+import { GameContext } from '../../context/GameContext';
 
 function GameBoard ({ gameState, onMove, onGameOver }){
         

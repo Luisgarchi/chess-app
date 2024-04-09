@@ -1,7 +1,8 @@
 import { useContext } from 'react';
+import { GameContext } from "../../context/GameContext"
+
 import DisplayPiece from './DisplayPiece';
 import DisplayOverlay from './DisplayOverlay';
-import { GameContext } from "../context/GameContext"
 
 export default function Square({ piece, maskValue, selectedPiecePosition, setNewPiece, position, turn }) {
 
