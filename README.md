@@ -1,6 +1,9 @@
 # Chess Game
 
 A React web app for two player chess.
+<p align = "center">
+    <img src="./public/React-App-Chess.gif" width = "500" ></video>
+</p>
 
 # Quick Setup
 - Run ``` git clone https://github.com/Luisgarchi/chess-app.git ```
@@ -34,11 +37,14 @@ A React web app for two player chess.
     - The single backward arrow moves the board state back by one move from the currently active state, facilitating a detailed analysis of the game's progression.
 
 
+## 3. Game and App State Flow
 
-- Select game type (bullet, rapid, blitz).
-- Chess game starts after first move.
-- Chess game ends after one player wins, resigns or both draw.
-- Each player has a timer
+The application and the gameplay can be intuitively managed through dialog modals, which are activated in specific scenarios to enhance the user experience and game interaction. These modals serve as crucial interfaces for player interaction, game configuration, and notifications of game status changes.
+
+- Welcome Message: The modal displays a WelcomeMessage component, greeting players and introducing them to the game.
+- Game Configuration: allows players to customize their game settings before beginning.
+- Game Over Notification: Upon the game reaching a "game-over" state it notifies players of the game's conclusion and the outcome.
+
 
 
 
