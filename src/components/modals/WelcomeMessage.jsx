@@ -6,14 +6,14 @@ import Button from "../uiComponents/Button";
 export default function WelcomeMessage() {
     
     const { setStates } = useContext(AppContext);
-    const { setGameStatus } = setStates;
+    const { setModalStatus } = setStates;
 
     function quickPlay() {
-        setGameStatus("game-start");
+        setModalStatus("none");
     }
 
     function onSelectConfig() {
-        setGameStatus("settings");
+        setModalStatus("settings");
     }
 
     // Updated buttonBaseStyle to include flex and items-center

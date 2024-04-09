@@ -9,7 +9,7 @@ export default function GameConfiguration() {
     // Get the states and setStates from the AppContext
     const { states, setStates } = useContext(AppContext)
     const { players, timeControls, increment } = states
-    const { setPlayers, setTimeControls, setIncrement, setGameStatus } = setStates
+    const { setPlayers, setTimeControls, setIncrement, setModalStatus, restartGame } = setStates
 
     // Local states for the form
     const [whiteName, setWhiteName] = useState(players.white)
@@ -86,8 +86,10 @@ export default function GameConfiguration() {
         setTimeControls(time)
         setIncrement(inc)
         setPlayers({white: whiteName, black: blackName})
-        setGameStatus("game-start")
+        setModalStatus("none")
+        restartGame()
     }
+
 
     return (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">

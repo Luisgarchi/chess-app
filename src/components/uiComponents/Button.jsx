@@ -7,6 +7,7 @@ import forward from "../../assets/forward.svg"
 import forwardforward from "../../assets/forwardforward.svg"
 import back from "../../assets/back.svg"
 import backback from "../../assets/backback.svg"
+import cancel from "../../assets/cancel.svg"
 
 const icon = {
     play: play,
@@ -18,6 +19,7 @@ const icon = {
     forwardforward: forwardforward,
     back: back,
     backback: backback,
+    cancel: cancel,
 }
 
 export default function Button({type, text, onClick, styles, iconStyles}) {

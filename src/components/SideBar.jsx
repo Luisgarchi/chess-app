@@ -8,11 +8,12 @@ import Button from "./uiComponents/Button"
 import MoveHistory from "./MoveHistory."
 
 
-export default function GameMode() {
+export default function SideBar() {
 
     // Get releveant context states
-    const { states } = useContext(AppContext);
-    const { chessLogs, timeControls, increment } = states;
+    const { states, setStates } = useContext(AppContext);
+    const { chessLogs, gameStatus, timeControls, increment } = states;
+    const { setModalStatus } = setStates;
 
     // Define component state
     const [opening, setOpening] = useState(null);
@@ -20,6 +21,13 @@ export default function GameMode() {
     // Derive states from context
     const currentFen = chessLogs[chessLogs.length - 1].fen;
     const openingRequest = `https://explorer.lichess.ovh/masters?fen=${currentFen}&moves=0&topGames=0`
+
+
+    useEffect(() => {
+        if(chessLogs.length === 1){
+            setOpening(null)
+        }
+    }, [chessLogs])
 
     // Set the game opening via a http request to Lichess' database
     useEffect(() => {
@@ -38,6 +46,16 @@ export default function GameMode() {
         fetchOpening()
     }, [currentFen, openingRequest])
 
+    function handleClickRestart(){
+        if (gameStatus === "not-started") {
+            return
+        }
+        setModalStatus("restart")
+    }
+
+    function handleClickSettings(){
+        setModalStatus("settings")
+    }
 
     let displayTime
 
@@ -59,8 +77,8 @@ export default function GameMode() {
                     <img src={arrowup} alt="increment" className="h-9 w-9 inline-block" />
                     <span className="text-stone-900 font-bold"> {increment}s</span>   
                 </div>
-                <Button type = "restart" iconStyles={"h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
-                <Button type = "settings" iconStyles={"h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
+                <Button onClick = {handleClickRestart} type = "restart" iconStyles={"bg-stone-200 h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
+                <Button onClick = {handleClickSettings} type = "settings" iconStyles={"bg-stone-200 h-10 w-10 mr-2 outline outline-2 rounded-md p-1"}/>
             </div>
 
             {/*  <Navigation />  */}

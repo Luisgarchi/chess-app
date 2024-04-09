@@ -8,21 +8,22 @@ import GameOver from "./GameOver";
  
 function Modal() {
 
-    const { states } = useContext(AppContext)
-    const { gameStatus } = states
+    const { states, setStates } = useContext(AppContext)
+    const { gameStatus, modalStatus } = states
+    const {restartGame} = setStates
 
     let modalContent = <></>
 
-    if (gameStatus === "app-start") {
+    if (modalStatus === "welcome") {
         modalContent = <WelcomeMessage />
     }
-    else if (gameStatus === "settings") {
+    else if (modalStatus === "settings") {
         modalContent = <GameConfiguration  />
     }    
     else if(gameStatus === "game-over") {
         modalContent = <GameOver />
     }
-    else if(gameStatus === "restart") {
+    else if(modalStatus === "restart") {
         modalContent = <RestartConfirmation />
     }
 

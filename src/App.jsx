@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 
-import GameMode from "./components/GameMode";
+import SideBar from "./components/SideBar";
 import Player from "./components/Player";
 import useChessTimers from "./useChessTimers";
 import GameBoard from "./components/GameBoard";
@@ -8,6 +8,7 @@ import Chess from "./chess/Chess";
 import Modal from "./components/modals/Modal";
 import { AppContext } from "./context/AppContext";
 import { fenStart } from "./chess/fenStart";
+import DisplayBoard from "./components/DisplayBoard";
 
 const INITIAL_PLAYERS = {
     white: "White",
@@ -19,9 +20,10 @@ export default function App(){
 
     // Define App States
     const [chessLogs, setChessLogs] = useState([{ move: null, fen: fenStart }])
-    const [gameDisplay, setGameDisplay] = useState(chessLogs[chessLogs.length - 1].fen)
-    const [gameStatus, setGameStatus] = useState("app-start");
+    const [displayId, setDisplayId] = useState(0)
+    const [gameStatus, setGameStatus] = useState("not-started");
     const [gameResult, setGameResult] = useState(undefined)
+    const [modalStatus, setModalStatus] = useState("welcome")
 
     // Define Custom Chess Game Settings
     const [players, setPlayers] = useState({...INITIAL_PLAYERS})
@@ -71,7 +73,6 @@ export default function App(){
     const handleMove = useCallback((fen, move, turn) => {
         setGameStatus("in-progress");
         setChessLogs(prevLogs => [...prevLogs, { move, fen }]);
-        
         if (timeControls !== undefined) {
             stopTimer(turn);
             const nextTurn = turn === 'w' ? 'b' : 'w';
@@ -79,12 +80,26 @@ export default function App(){
         }
     }, [timeControls, startTimer, stopTimer]);
 
+    useEffect(() => {
+        setDisplayId(chessLogs.length -1);
+
+    },[chessLogs])
+    
+
     function resignGame(colour){
         setGameStatus("game-over");
         setGameResult(`${colour === 'w' ? players.black : players.white} wins by resignation`);
         stopBothTimers()
     }
 
+    function restartGame(){
+        setChessLogs([{ move: null, fen: fenStart }]);
+        setGameStatus("not-started");
+        setModalStatus("none");
+        setGameResult(undefined);
+        setDisplayId(0);
+        initTimers(timeControls, increment)
+    }
 
     useEffect(()=> {
         initTimers(timeControls, increment)
@@ -92,11 +107,13 @@ export default function App(){
 
 
     // Modal Context
-    const modalStates = { chessLogs, gameStatus, gameResult, players, timeControls, increment }
-    const modalSetStates = { setChessLogs, setGameStatus, setGameResult, setPlayers, setTimeControls, setIncrement, initTimers }
+    const modalStates = { chessLogs, displayId, gameStatus, gameResult, modalStatus, players, timeControls, increment }
+    const modalSetStates = { setChessLogs, setDisplayId, setGameStatus, setGameResult, setModalStatus, setPlayers, setTimeControls, setIncrement, initTimers, restartGame }
     const modalCtxValues = { states: modalStates, setStates: modalSetStates }
 
-
+    const displaGame = useMemo(() => (displayId === chessLogs.length - 1), [chessLogs, displayId])
+    const displayFen = useMemo(() => chessLogs[displayId].fen, [chessLogs, displayId])
+    
 
     return (
         <AppContext.Provider value = {modalCtxValues}>
@@ -106,22 +123,15 @@ export default function App(){
                 <div className="flex gap-4">
                     <div className="flex flex-col items-center justify-center gap-4">
                         <Player initialName={players.black} colour="b" onChangeName={() => {return}} time = {blackTime} resign = {resignGame}/>
-                        <GameBoard gameState = {gameState} onMove = {handleMove} onGameOver = {handleGameOver} />
+                        { displaGame && <GameBoard gameState = {gameState} onMove = {handleMove} onGameOver = {handleGameOver} />}
+                        { !displaGame && <DisplayBoard gameState = {displayFen} />}
                         <Player initialName={players.white} colour="w" onChangeName={() => {return}} time = {whiteTime} resign = {resignGame}/>
                     </div>
                     <div className="flex flex-col items-center justify-center">
-                        <GameMode chessLogs = {chessLogs}/>
+                        <SideBar chessLogs = {chessLogs}/>
                     </div>
                 </div>
             </div>
         </AppContext.Provider>
     )
 }
-
-
-/**Move / Leave the timers in the main App.jsx file.
-
-Make move can behalf in the main App.jsx file (this should be the logic that is concerned with handling the timers and the chessLogs)
-- Logic that has to do with parsing the moves and the fen can be in the Game Component. (Pass these values back to the function define in the App)
-
-Create a context API for time? Use in app consumed inside player. */
