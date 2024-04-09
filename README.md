@@ -2,7 +2,7 @@
 
 A React web app for two player chess.
 <p align = "center">
-    <img src="./public/React-App-Chess.gif" width = "500" ></video>
+    <img src="./public/React-App-Chess.gif" width = "800" ></video>
 </p>
 
 # Quick Setup
