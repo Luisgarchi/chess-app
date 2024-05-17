@@ -5,7 +5,7 @@ import timer from "../assets/icons/timer.svg"
 import arrowup from "../assets/icons/arrowup.svg"
 
 import Button from "./uiComponents/Button"
-import MoveHistory from "./MoveHistory."
+import MoveHistory from "./MoveHistory"
 
 
 export default function SideBar() {

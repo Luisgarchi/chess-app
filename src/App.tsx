@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 import SideBar from "./components/SideBar";
 import Player from "./components/Player";
@@ -15,22 +15,41 @@ const INITIAL_PLAYERS = {
     black: "Black",
 }
 
+interface ChessLog {
+    move: string | null;
+    fen: string;
+}
 
-export default function App(){
+type GameStatus = 'not-started' | 'in-progress' | 'game-over';
+type GameResult = string | undefined; 
+type Colour = 'w' | 'b'
+
+interface PlayerType {
+    white: string;
+    black: string;
+}
+
+interface Payload {
+    type: 'CHECKMATE' | 'STALEMATE' | 'FIFTYMOVE' | 'TIME';
+    turn: Colour;
+}
+
+
+const App: React.FC = () => { 
 
     /* _______   State   _______*/
 
     // Define App States
-    const [chessLogs, setChessLogs] = useState([{ move: null, fen: fenStart }])
-    const [displayId, setDisplayId] = useState(0)
-    const [gameStatus, setGameStatus] = useState("not-started");
-    const [gameResult, setGameResult] = useState(undefined)
-    const [modalStatus, setModalStatus] = useState("welcome")
+    const [chessLogs, setChessLogs] = useState<ChessLog[]>([{ move: null, fen: fenStart }]);
+    const [displayId, setDisplayId] = useState<number>(0);
+    const [gameStatus, setGameStatus] = useState<GameStatus>("not-started");
+    const [gameResult, setGameResult] = useState<GameResult>(undefined);
+    const [modalStatus, setModalStatus] = useState<string>("welcome");
 
     // Define Custom Chess Game Settings
-    const [players, setPlayers] = useState({...INITIAL_PLAYERS})
-    const [increment, setIncrement] = useState(0)
-    const [timeControls, setTimeControls] = useState(undefined)
+    const [players, setPlayers] = useState<PlayerType>({...INITIAL_PLAYERS});
+    const [increment, setIncrement] = useState<number>(0);
+    const [timeControls, setTimeControls] = useState<number | undefined>(undefined);
 
     // Define Chess Timers (custom hook)
     const { whiteTime, blackTime, startTimer, stopTimer, stopBothTimers, initTimers } = useChessTimers(timeControls, increment);
@@ -48,7 +67,7 @@ export default function App(){
             // Game ends due to time running out, so the player with time left wins
             setGameStatus("game-over");
             setGameResult(`${whiteTime === 0 ? players.black : players.white} wins on time`);
-            stopTimer()
+            stopBothTimers()
         }
     }, [whiteTime, blackTime])
 
@@ -74,22 +93,23 @@ export default function App(){
 
     /* _______   Functions   _______*/
     
-    function handleGameOver(payload){
-        setGameStatus("game-over")
+    function handleGameOver(payload: Payload): void{
+        setGameStatus("game-over");
 
-        if (payload.type === "CHECKMATE"){
-            setGameResult(`Checkmate - ${payload.turn === 'w' ? players.black : players.white} wins`);
-        } else if (payload.type === "STALEMATE"){
-            setGameResult("Draw - Stalemate")
-        } else if (payload.type === "FIFTYMOVE"){
-            setGameResult("Draw - Fifty-move rule")
-        } else if (payload.type === "TIME"){
-            setGameResult(`${payload.turn === 'w' ? players.black : players.white} wins on time`)
+        let winner = payload.turn === 'w' ? players.black : players.white;
+        if (payload.type === "CHECKMATE") {
+            setGameResult(`Checkmate - ${winner} wins`);
+        } else if (payload.type === "STALEMATE") {
+            setGameResult("Draw - Stalemate");
+        } else if (payload.type === "FIFTYMOVE") {
+            setGameResult("Draw - Fifty-move rule");
+        } else if (payload.type === "TIME") {
+            setGameResult(`${winner} wins on time`);
         }
-        stopBothTimers()
+        stopBothTimers();
     }
 
-    const handleMove = useCallback((fen, move, turn) => {
+    const handleMove = useCallback((fen: string, move: string, turn: Colour): void => {
         setGameStatus("in-progress");
         setChessLogs(prevLogs => [...prevLogs, { move, fen }]);
         if (timeControls !== undefined) {
@@ -100,13 +120,13 @@ export default function App(){
     }, [timeControls, startTimer, stopTimer]);
     
 
-    function resignGame(colour){
+    function resignGame(colour: Colour): void {
         setGameStatus("game-over");
         setGameResult(`${colour === 'w' ? players.black : players.white} wins by resignation`);
         stopBothTimers()
     }
 
-    function restartGame(){
+    function restartGame(): void {
         setChessLogs([{ move: null, fen: fenStart }]);
         setGameStatus("not-started");
         setModalStatus("none");
@@ -117,9 +137,35 @@ export default function App(){
 
 
     // App State context
+
+    interface ModalContextType {
+        states: {
+            chessLogs: ChessLog[];
+            displayId: number;
+            gameStatus: GameStatus;
+            gameResult: GameResult;
+            modalStatus: string;
+            players: PlayerType;
+            timeControls: number | undefined;
+            increment: number;
+        };
+        setStates: {
+            setChessLogs: React.Dispatch<React.SetStateAction<ChessLog[]>>;
+            setDisplayId: React.Dispatch<React.SetStateAction<number>>;
+            setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>>;
+            setGameResult: React.Dispatch<React.SetStateAction<GameResult>>;
+            setModalStatus: React.Dispatch<React.SetStateAction<string>>;
+            setPlayers: React.Dispatch<React.SetStateAction<PlayerType>>;
+            setTimeControls: React.Dispatch<React.SetStateAction<number | undefined>>;
+            setIncrement: React.Dispatch<React.SetStateAction<number>>;
+            initTimers: (tc?: number, inc?: number) => void;
+            restartGame: () => void;
+        };
+    }
+
     const modalStates = { chessLogs, displayId, gameStatus, gameResult, modalStatus, players, timeControls, increment }
     const modalSetStates = { setChessLogs, setDisplayId, setGameStatus, setGameResult, setModalStatus, setPlayers, setTimeControls, setIncrement, initTimers, restartGame }
-    const modalCtxValues = { states: modalStates, setStates: modalSetStates }
+    const modalCtxValues: ModalContextType = { states: modalStates, setStates: modalSetStates }
 
     const displaGame = useMemo(() => (displayId === chessLogs.length - 1), [chessLogs, displayId])
     const displayFen = useMemo(() => chessLogs[displayId].fen, [chessLogs, displayId])
@@ -147,3 +193,5 @@ export default function App(){
         </AppContext.Provider>
     )
 }
+
+export default App;
